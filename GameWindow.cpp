@@ -56,6 +56,7 @@ GameWindow::game_init()
 
     level = new LEVEL(1);
     menu = new Menu();
+    active_scene = GAME_MENU;
 }
 
 bool
@@ -163,16 +164,16 @@ GameWindow::create_monster()
 void
 GameWindow::game_play()
 {
-    active_scene = GAME_CONTINUE;
-    srand(time(NULL));
     
-    if(active_scene ==  GAME_INIT){
-        
+    
+    
+    if(active_scene ==  GAME_MENU){
+
         al_draw_bitmap(menu_pic, 0, 0, 0);
-        if (pnt_in_rect(mouse_x, mouse_y,field_width/2, 10, 38, 38))
+        /*if (pnt_in_rect(mouse_x, mouse_y,field_width/2, 10, 38, 38))
             al_draw_bitmap(start_button1,field_width/2, 10, 0);
         else
-            al_draw_bitmap(start_button2, field_width/2, 10, 0);
+            al_draw_bitmap(start_button2, field_width/2, 10, 0);*/
         
     }
     else if(active_scene == GAME_CONTINUE){
@@ -189,6 +190,7 @@ GameWindow::game_play()
 
         
     }
+    al_flip_display();
     while(active_scene != GAME_EXIT)
     {
         active_scene = game_run();
@@ -287,64 +289,67 @@ int
 GameWindow::game_update()
 {
     unsigned int i, j;
-    std::list<Tower*>::iterator it;
+    if(active_scene == GAME_CONTINUE){
+            std::list<Tower*>::iterator it;
 
-    /*TODO:*/
-    /*Allow towers to detect if monster enters its range*/
-    /*Hint: Tower::DetectAttack*/
-    for (auto tower : towerSet)
-    {
-        for(auto monster : monsterSet){
-            tower->DetectAttack(monster);
+        /*TODO:*/
+        /*Allow towers to detect if monster enters its range*/
+        /*Hint: Tower::DetectAttack*/
+        for (auto tower : towerSet)
+        {
+            for(auto monster : monsterSet){
+                tower->DetectAttack(monster);
+            }
+        }
+        
+        // update every monster
+        // check if it is destroyed or reaches end point
+        for(i=0; i < monsterSet.size(); i++)
+        {
+            bool isDestroyed = false, isReachEnd = false;
+            
+            /*TODO:*/
+            /*1. For each tower, traverse its attack set*/
+            /*2. If the monster collide with any attack, reduce the HP of the monster*/
+            /*3. Remember to set isDestroyed to "true" if monster is killed*/
+            /*Hint: Tower::TriggerAttack*/
+            for(auto tower : towerSet){
+                isDestroyed = tower->TriggerAttack(monsterSet[i]);
+            }
+            isReachEnd = monsterSet[i]->Move();
+
+            if(isDestroyed)
+            {
+                Monster *m = monsterSet[i];
+
+                menu->Change_Coin(m->getWorth());
+                menu->Gain_Score(m->getScore());
+                monsterSet.erase(monsterSet.begin() + i);
+                i--;
+                delete m;
+
+            }
+            else if(isReachEnd)
+            {
+                Monster *m = monsterSet[i];
+
+                if(menu->Subtract_HP())
+                    return GAME_EXIT;
+
+                monsterSet.erase(monsterSet.begin() + i);
+                i--;
+                delete m;
+            }
+        }
+
+        /*TODO:*/
+        /*1. Update the attack set of each tower*/
+        /*Hint: Tower::UpdateAttack*/
+        for(auto tower : towerSet){
+            tower->UpdateAttack();
         }
     }
     
-    // update every monster
-    // check if it is destroyed or reaches end point
-    for(i=0; i < monsterSet.size(); i++)
-    {
-        bool isDestroyed = false, isReachEnd = false;
-        
-        /*TODO:*/
-        /*1. For each tower, traverse its attack set*/
-        /*2. If the monster collide with any attack, reduce the HP of the monster*/
-        /*3. Remember to set isDestroyed to "true" if monster is killed*/
-        /*Hint: Tower::TriggerAttack*/
-        for(auto tower : towerSet){
-            isDestroyed = tower->TriggerAttack(monsterSet[i]);
-        }
-        isReachEnd = monsterSet[i]->Move();
-
-        if(isDestroyed)
-        {
-            Monster *m = monsterSet[i];
-
-            menu->Change_Coin(m->getWorth());
-            menu->Gain_Score(m->getScore());
-            monsterSet.erase(monsterSet.begin() + i);
-            i--;
-            delete m;
-
-        }
-        else if(isReachEnd)
-        {
-            Monster *m = monsterSet[i];
-
-            if(menu->Subtract_HP())
-                return GAME_EXIT;
-
-            monsterSet.erase(monsterSet.begin() + i);
-            i--;
-            delete m;
-        }
-    }
-
-    /*TODO:*/
-    /*1. Update the attack set of each tower*/
-    /*Hint: Tower::UpdateAttack*/
-    for(auto tower : towerSet){
-        tower->UpdateAttack();
-    }
 
     return GAME_CONTINUE;
 }
@@ -420,10 +425,13 @@ GameWindow::process_event()
     if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
         return GAME_EXIT;
     }
-    if(active_scene == GAME_INIT){
-        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN){
-            if(pnt_in_rect(mouse_x, mouse_y, field_width/2, 10, 38, 38)){
-                return GAME_CONTINUE;
+    if(active_scene == GAME_MENU){
+        if(event.type == ALLEGRO_EVENT_KEY_DOWN){
+            //if(pnt_in_rect(mouse_x, mouse_y, field_width/2, 10, 38, 38))
+            if(event.keyboard.keycode == ALLEGRO_KEY_ENTER)
+            {
+                instruction = GAME_CONTINUE;
+                redraw = true;
             }
         }
     }
@@ -531,16 +539,15 @@ GameWindow::process_event()
 
             }
 
-            if(redraw) {
-                // update each object in game
-                instruction = game_update();
-
-                // Re-draw map
-                draw_running_map();
-                redraw = false;
-            }
+            
     }
-    
+    if(redraw) {
+        // update each object in game
+        instruction = game_update();
+        // Re-draw map
+        draw_running_map();
+        redraw = false;
+    }
 
     return instruction;
 }
@@ -549,10 +556,10 @@ void
 GameWindow::draw_running_map()
 {
     unsigned int i, j;
-    printf("hello\n");
+    //printf("hello\n");
     al_clear_to_color(al_map_rgb(100, 100, 100));
     al_draw_bitmap(background, 0, 0, 0);
-
+    //al_draw_bitmap(menu_pic, 0, 0, 0);
     for(i = 0; i < field_height/40; i++)
     {
         for(j = 0; j < field_width/40; j++)

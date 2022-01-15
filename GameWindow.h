@@ -22,7 +22,7 @@
 
 #define GAME_INIT -1
 #define GAME_SETTING 0
-#define GAME_BEGIN 1
+#define GAME_MENU 1
 #define GAME_CONTINUE 2
 #define GAME_TURNBACK 3
 #define GAME_TERMINATE 4
