@@ -32,9 +32,9 @@ GameWindow::game_init()
 
     icon = al_load_bitmap("./icon.png");
     background = al_load_bitmap("./StartBackground.jpg");
-    menu_pic = al_load_bitmap("./new_photo/menu.png");
-    start_button1 = al_load_bitmap("./new_photo/start-button_1.jpg");
-    start_button2 = al_load_bitmap("./new_photo/start-button_2.jpg");
+    menu_pic = al_load_bitmap("./menu.png");
+    start_button1 = al_load_bitmap("./start-button_1.jpg");
+    start_button2 = al_load_bitmap("./start-button_2.jpg");
     for(int i = 0; i < Num_TowerType; i++)
     {
         sprintf(buffer, "./Tower/%s.png", TowerClass[i]);
@@ -163,12 +163,9 @@ GameWindow::create_monster()
 void
 GameWindow::game_play()
 {
-    active_scene = GAME_INIT;
+    active_scene = GAME_CONTINUE;
+    srand(time(NULL));
     
-    while(active_scene != GAME_EXIT)
-    {
-        active_scene = game_run();
-    }
     if(active_scene ==  GAME_INIT){
         
         al_draw_bitmap(menu_pic, 0, 0, 0);
@@ -182,19 +179,28 @@ GameWindow::game_play()
         //messqge
         
 
-        srand(time(NULL));
-
+        
+        printf("hello world\n");
         //active_scene = -1;
         game_reset();
         game_begin();
 
         
 
-        show_err_msg(active_scene);
+        
     }
-    
+    while(active_scene != GAME_EXIT)
+    {
+        active_scene = game_run();
+    }
+    show_err_msg(active_scene);
 }
-
+bool GameWindow::pnt_in_rect(int px, int py, int x, int y, int w, int h) {
+    if(px <= x + w && px >= x && py <= y + h && py >= y)
+   return true;
+    else
+   return false;
+}
 void
 GameWindow::show_err_msg(int msg)
 {
@@ -273,6 +279,7 @@ GameWindow::game_run()
 
         error = process_event();
     }
+    //printf("test error %d\n", error);
     return error;
 }
 
@@ -407,7 +414,7 @@ GameWindow::process_event()
     // offset for pause window
     int offsetX = field_width/2 - 200;
     int offsetY = field_height/2 - 200;
-
+    printf("test: %d\n",active_scene);
     al_wait_for_event(event_queue, &event);
     redraw = false;
     if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
@@ -542,7 +549,7 @@ void
 GameWindow::draw_running_map()
 {
     unsigned int i, j;
-
+    printf("hello\n");
     al_clear_to_color(al_map_rgb(100, 100, 100));
     al_draw_bitmap(background, 0, 0, 0);
 
@@ -577,9 +584,3 @@ GameWindow::draw_running_map()
     al_flip_display();
 }
 
-bool pnt_in_rect(int px, int py, int x, int y, int w, int h) {
-    if(px <= x + w && px >= x && py <= y + h && py >= y)
-   return true;
-    else
-   return false;
-}
