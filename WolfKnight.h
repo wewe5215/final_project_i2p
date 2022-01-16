@@ -1,3 +1,4 @@
+
 #ifndef REDDRAGON_H_INCLUDED
 #define REDDRAGON_H_INCLUDED
 
@@ -10,8 +11,6 @@ public:
     {
         direction_count[LEFT] = 4;
         direction_count[RIGHT] = 4;
-        direction_count[UP] = 4;
-        direction_count[DOWN] = 4;
 
         HealthPoint = 40;
         speed = 2;

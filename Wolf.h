@@ -10,8 +10,6 @@ public:
     {
         direction_count[LEFT] = 5;
         direction_count[RIGHT] = 5;
-        direction_count[UP] = 4;
-        direction_count[DOWN] = 4;
 
         HealthPoint = 20;
         speed = 1;
