@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H_INCLUDED
 #define MAINWINDOW_H_INCLUDED
-
+#include <stdlib.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 #include <vector>
@@ -12,9 +12,10 @@
 #include "CaveMan.h"
 #include "Wolf.h"
 #include "DemonNijia.h"
+#include "Tower.h"
 #include "Attack.h"
 #include "Slider.h"
-#include "Tower.h"
+
 #define GAME_INIT -1
 #define GAME_SETTING 0
 #define GAME_MENU 1
@@ -42,7 +43,21 @@ const int LevelNum = 4;
 // 1 coin every 2 seconds
 const int CoinSpeed = FPS * 2;
 const int Coin_Time_Gain = 1;
-
+/*typedef struct {
+    // The center coordinate of the image.
+    int x, y;
+    // The width and height of the object.
+    int w, h;
+    // The velocity in x, y axes.
+    int vx;
+    // The pointer to the object’s image.
+    int hp;
+    int mp;
+    int attack;
+    int speed;
+    int defence;
+    ALLEGRO_BITMAP* img;
+} MovableObject;*/
 class GameWindow
 {
 public:
@@ -69,7 +84,7 @@ public:
 // Function to change from one scene to another.
     void game_change_scene(int next_scene);
     Monster* create_monster();
-    void draw_movable_object(Tower* obj);
+    //void draw_movable_object(MovableObject* obj);
 // Load resized bitmap and check if failed.
     ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h);
 // [HACKATHON 3-2]
@@ -88,7 +103,7 @@ void draw_running_map();
 public:
     bool initial = true;
     int active_scene;
-    Tower* player;
+    int role = 1;
     // Keyboard state, whether the key is down or not.
     bool key_state[ALLEGRO_KEY_MAX];
     // Mouse state, whether the key is down or not.
@@ -96,6 +111,8 @@ public:
     bool *mouse_state;
     // Mouse position.
     int mouse_x, mouse_y;
+
+    //MovableObject* player;
     enum {
     SCENE_MENU = 1,
     SCENE_START = 2
@@ -139,7 +156,7 @@ private:
     int Monster_Pro_Count = 0;
     int Coin_Inc_Count = 0;
     int selectedTower = -1, lastClicked = -1;
-    int role = 1;
+
     bool redraw = false;
     bool mute = false;
 };
