@@ -18,10 +18,7 @@ void set_attack_volume(float volume)
     Attack::volume = volume;
 }
 
-bool compare(Tower *t1, Tower *t2)
-{
-    return (t1->getY() <= t2->getY());
-}
+
 GameWindow::GameWindow()
 {
     if (!al_init())
@@ -78,11 +75,11 @@ void GameWindow::game_init(void) {
     role2 = al_load_bitmap("./role2.png");
     role3 = al_load_bitmap("./role3.png");
     role4 = al_load_bitmap("./role4.png");
-    for(int i = 0; i < Num_TowerType; i++)
+    /*for(int i = 0; i < Num_TowerType; i++)
     {
         sprintf(buffer, "./Tower/%s.png", TowerClass[i]);
         tower[i] = al_load_bitmap(buffer);
-    }
+    }*/
 
     al_set_display_icon(display, icon);
     al_reserve_samples(3);
@@ -194,49 +191,55 @@ void GameWindow::game_start_event_loop(void) {
 void GameWindow::game_update(void) {
     if (active_scene == SCENE_START) {
         unsigned int i, j;
-    std::list<Tower*>::iterator it;
-
-    /*TODO:*/
-    /*Allow towers to detect if monster enters its range*/
-    /*Hint: Tower::DetectAttack*/
-
-    // update every monster
-    // check if it is destroyed or reaches end point
-    for(i=0; i < monsterSet.size(); i++)
-    {
-        bool isDestroyed = false, isReachEnd = false;
-
-        /*TODO:*/
-        /*1. For each tower, traverse its attack set*/
-        /*2. If the monster collide with any attack, reduce the HP of the monster*/
-        /*3. Remember to set isDestroyed to "true" if monster is killed*/
-        /*Hint: Tower::TriggerAttack*/
-
-        isReachEnd = monsterSet[i]->Move();
-
-        if(isDestroyed)
+        player->vx = 0;
+        
+        if (key_state[ALLEGRO_KEY_LEFT] || key_state[ALLEGRO_KEY_A])
+            player->vx -= player->speed;
+        if (key_state[ALLEGRO_KEY_RIGHT] || key_state[ALLEGRO_KEY_D])
+            player->vx += player->speed;
+        // 0.71 is (1/sqrt(2)).
+        
+        player->x += player->vx;
+        // [HACKATHON 1-1]
+        // TODO: Limit the plane's collision box inside the frame.
+        //       (x, y axes can be separated.)
+        // Uncomment and fill in the code below.
+        if (player->x -0 - player->w/2 < 0)
+            player->x = (player->w)/2;
+        else if (player->x + player->w/2 > field_width)
+            player->x = -(player->w)/2;
+        
+        
+        for(i=0; i < monsterSet.size(); i++)
         {
-            Monster *m = monsterSet[i];
+            bool isDestroyed = false, isReachEnd = false;
 
-            menu->Change_Coin(m->getWorth());
-            menu->Gain_Score(m->getScore());
-            monsterSet.erase(monsterSet.begin() + i);
-            i--;
-            delete m;
+            
+            isReachEnd = monsterSet[i]->Move();
 
+            if(isDestroyed)
+            {
+                Monster *m = monsterSet[i];
+
+                menu->Change_Coin(m->getWorth());
+                menu->Gain_Score(m->getScore());
+                monsterSet.erase(monsterSet.begin() + i);
+                i--;
+                delete m;
+
+            }
+            else if(isReachEnd)
+            {
+                Monster *m = monsterSet[i];
+
+                if(menu->Subtract_HP())
+                    game_change_scene(4);
+
+                monsterSet.erase(monsterSet.begin() + i);
+                i--;
+                delete m;
+            }
         }
-        else if(isReachEnd)
-        {
-            Monster *m = monsterSet[i];
-
-            if(menu->Subtract_HP())
-                game_change_scene(4);
-
-            monsterSet.erase(monsterSet.begin() + i);
-            i--;
-            delete m;
-        }
-    }
         
         
     }
@@ -297,10 +300,7 @@ void
 GameWindow::game_reset()
 {
     // reset game and begin
-    for(auto&& child : towerSet) {
-        delete child;
-    }
-    towerSet.clear();
+    
     monsterSet.clear();
 
 
@@ -335,8 +335,7 @@ GameWindow::game_destroy()
     al_destroy_timer(timer);
     al_destroy_timer(monster_pro);
 
-    for(int i=0;i<5; i++)
-        al_destroy_bitmap(tower[i]);
+    
 
     al_destroy_bitmap(icon);
     al_destroy_bitmap(background);
@@ -376,13 +375,38 @@ void GameWindow::game_change_scene(int next_scene) {
     }
     else if (active_scene == SCENE_START)
     {
-        if(Monster_Pro_Count == 0) {
+        //help me to set the values
+        
+        if(role == 1){
+            player->img = role1;
+            player->attack = 20;
+            player->hp = 300;
+            player->mp = 400;
+            player->vx = 0;
+            player->x = 400;
+            player->y = 300;
+            player->defence = 200;
+            player->speed = 5;
+        }
+        else if(role == 2){
+            player->img = role2;
+        }
+        else if(role == 3){
+            player->img = role3;
+        }
+        else if(role == 4){
+            player->img = role4;
+        }
+        player->w = al_get_bitmap_width(player->img);
+        player->h = al_get_bitmap_height(player->img);
+        draw_movable_object(player);
+        /*if(Monster_Pro_Count == 0) {
                 Monster *m = create_monster();
 
                 if(m != NULL)
                     monsterSet.push_back(m);
         }
-        Monster_Pro_Count = (Monster_Pro_Count + 1) % level->getMonsterSpeed();
+        Monster_Pro_Count = (Monster_Pro_Count + 1) % level->getMonsterSpeed();*/
     }
     
     /*else if(active_scene==SCENE_WIN)
@@ -416,6 +440,14 @@ void GameWindow::on_key_down(int keycode) {
            game_change_scene(SCENE_MENU);
         else if(keycode == ALLEGRO_KEY_ENTER)
             game_change_scene(SCENE_START);
+        else if(keycode == ALLEGRO_KEY_1)
+            role = 1;
+        else if(keycode == ALLEGRO_KEY_2)
+            role = 2;
+        else if(keycode == ALLEGRO_KEY_3)
+            role = 3;
+        else if(keycode == ALLEGRO_KEY_4)
+            role = 4;
     }
     
     
@@ -439,10 +471,9 @@ void GameWindow::on_mouse_down(int btn, int x, int y) {
     }
 }
 
-/*void GameWindow::draw_movable_object(MovableObject obj) {
-    if (obj.hidden)
-        return;
-    al_draw_bitmap(obj.img, round(obj.x - obj.w / 2), round(obj.y - obj.h / 2), 0);
+void GameWindow::draw_movable_object(Tower* obj) {
+    
+    al_draw_bitmap(obj->img, round(obj->x - obj->w / 2), round(obj->y - obj->h / 2), 0);
 }
 
 ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h) {
@@ -460,7 +491,7 @@ ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h) {
     al_destroy_bitmap(loaded_bmp);
 
     return resized_bmp;
-}*/
+}
 
 
 bool GameWindow::pnt_in_rect(int px, int py, int x, int y, int w, int h) {

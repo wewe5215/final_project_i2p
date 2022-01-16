@@ -12,14 +12,9 @@
 #include "CaveMan.h"
 #include "Wolf.h"
 #include "DemonNijia.h"
-#include "Arcane.h"
-#include "Archer.h"
-#include "Canon.h"
-#include "Poison.h"
-#include "Storm.h"
 #include "Attack.h"
 #include "Slider.h"
-
+#include "Tower.h"
 #define GAME_INIT -1
 #define GAME_SETTING 0
 #define GAME_MENU 1
@@ -74,6 +69,7 @@ public:
 // Function to change from one scene to another.
     void game_change_scene(int next_scene);
     Monster* create_monster();
+    void draw_movable_object(Tower* obj);
 // Load resized bitmap and check if failed.
     ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h);
 // [HACKATHON 3-2]
@@ -92,7 +88,7 @@ void draw_running_map();
 public:
     bool initial = true;
     int active_scene;
-    
+    Tower* player;
     // Keyboard state, whether the key is down or not.
     bool key_state[ALLEGRO_KEY_MAX];
     // Mouse state, whether the key is down or not.
@@ -143,7 +139,7 @@ private:
     int Monster_Pro_Count = 0;
     int Coin_Inc_Count = 0;
     int selectedTower = -1, lastClicked = -1;
-
+    int role = 1;
     bool redraw = false;
     bool mute = false;
 };
