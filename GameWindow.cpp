@@ -71,8 +71,13 @@ void GameWindow::game_init(void) {
     char buffer[50];
 
     icon = al_load_bitmap("./icon.png");
-    background = al_load_bitmap("./StartBackground.jpg");
+    background = al_load_bitmap("./StartBackground.png");
     menu_pic = al_load_bitmap("./menu.png");
+    settings_pic = al_load_bitmap("./setting.jpg");
+    role1 = al_load_bitmap("./role1.png");
+    role2 = al_load_bitmap("./role2.png");
+    role3 = al_load_bitmap("./role3.png");
+    role4 = al_load_bitmap("./role4.png");
     for(int i = 0; i < Num_TowerType; i++)
     {
         sprintf(buffer, "./Tower/%s.png", TowerClass[i]);
@@ -238,9 +243,17 @@ void GameWindow::game_update(void) {
 }
 
 void GameWindow::game_draw(void) {
+    const int gapX = 40, gapY = 30;
+    const int offsetX = 30 + field_width, offsetY = 150;
+    const int Initial_Health = 1;
+    char buffer[100];
     if (active_scene == SCENE_MENU) {
         al_draw_bitmap(menu_pic, 0, 0, 0);
-        
+        sprintf(buffer, "PRESS ENTER TO START");
+        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 20, 20 + gapY, 0, buffer);
+
+        sprintf(buffer, "PRESS S TO SETTING");
+        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 20, 20 + 2*gapY, 0, buffer);
     }
 //    
     else if (active_scene == SCENE_START) {
@@ -265,7 +278,17 @@ void GameWindow::game_draw(void) {
 
     menu->Draw();
     }
-    
+    else if(active_scene == SCENE_SETTINGS){
+        al_draw_bitmap(settings_pic, 0, 0, 0);
+        al_draw_bitmap(role1, 0, 30, 0);
+        al_draw_bitmap(role2, 150, 30, 0);
+        al_draw_bitmap(role3, 300, 30, 0);
+        al_draw_bitmap(role4, 450, 30, 0);
+        sprintf(buffer, "role1           role2           role3           role4");
+        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 100, 300, 0, buffer);
+        sprintf(buffer, "PRESS 1 2 3 4 TO CHOOSE ROLE");
+        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 100, 350, 0, buffer);
+    }
    
     al_flip_display();
 }
@@ -380,7 +403,8 @@ void GameWindow::on_key_down(int keycode) {
     {
         if (keycode == ALLEGRO_KEY_ENTER)
             game_change_scene(SCENE_START);
-        
+        else if(keycode == ALLEGRO_KEY_S)
+            game_change_scene(SCENE_SETTINGS);
       
     }
     
@@ -390,7 +414,8 @@ void GameWindow::on_key_down(int keycode) {
     else if (active_scene == SCENE_SETTINGS) {
         if (keycode == ALLEGRO_KEY_BACKSPACE)
            game_change_scene(SCENE_MENU);
-        
+        else if(keycode == ALLEGRO_KEY_ENTER)
+            game_change_scene(SCENE_START);
     }
     
     

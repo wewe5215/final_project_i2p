@@ -115,6 +115,10 @@ private:
     ALLEGRO_BITMAP *settings_pic;
     ALLEGRO_BITMAP *start_button1;
     ALLEGRO_BITMAP *start_button2;
+    ALLEGRO_BITMAP *role1;
+    ALLEGRO_BITMAP *role2;
+    ALLEGRO_BITMAP *role3;
+    ALLEGRO_BITMAP *role4;
     ALLEGRO_DISPLAY* display = NULL;
     ALLEGRO_FONT *font = NULL;
     ALLEGRO_FONT *Medium_font = NULL;
