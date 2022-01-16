@@ -54,31 +54,59 @@ public:
     // constructor
     GameWindow();
     // each process of scene
-    void game_init();
-    void game_reset();
-    void game_play();
-    void game_begin();
-    int game_run();
-    int game_update();
-    void show_err_msg(int msg);
-    void game_destroy();
-
-    // each drawing scene function
-    void draw_running_map();
-    bool pnt_in_rect(int px, int py, int x, int y, int w, int h);
-    // process of updated event
-    int process_event();
-    // detect if mouse hovers over a rectangle
-    bool mouse_hover(int, int, int, int);
-    // detect if a tower will be constructed on road
-    bool isOnRoad();
     
-    Tower* create_tower(int);
+// Initialize variables and resources.
+// Allows the game to perform any initialization it needs before
+// starting to run.
+    void game_init(void);
+// Process events inside the event queue using an infinity loop.
+    void game_start_event_loop(void);
+// Run game logic such as updating the world, checking for collision,
+// switching scenes and so on.
+// This is called when the game should update its logic.
+    void game_update(void);
+// Draw to display.
+// This is called when the game should draw itself.
+    void game_draw(void);
+// Release resources.
+// Free the pointers we allocated.
+    void game_destroy(void);
+// Function to change from one scene to another.
+    void game_change_scene(int next_scene);
     Monster* create_monster();
+// Load resized bitmap and check if failed.
+    ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h);
+// [HACKATHON 3-2]
+// TODO: Declare a function.
+// Determines whether the point (px, py) is in rect (x, y, w, h).
+// Uncomment the code below.
+bool pnt_in_rect(int px, int py, int x, int y, int w, int h);
 
+/* Event callbacks. */
+void on_key_down(int keycode);
+void on_mouse_down(int btn, int x, int y);
+void show_err_msg(int msg);
+void game_reset();
+void game_begin();
+void draw_running_map();
 public:
     bool initial = true;
     int active_scene;
+    
+    // Keyboard state, whether the key is down or not.
+    bool key_state[ALLEGRO_KEY_MAX];
+    // Mouse state, whether the key is down or not.
+    // 1 is for left, 2 is for right, 3 is for middle.
+    bool *mouse_state;
+    // Mouse position.
+    int mouse_x, mouse_y;
+    enum {
+    SCENE_MENU = 1,
+    SCENE_START = 2
+    // [HACKATHON 3-7]
+    // TODO: Declare a new scene id.
+    , SCENE_SETTINGS = 3,SCENE_GAME_OVER=4,SCENE_WIN=5,SCENE_PALSE=6,SCENE_RANK=7,SCENE_INTRO=8
+};
 private:
     ALLEGRO_BITMAP *icon;
     ALLEGRO_BITMAP *tower[Num_TowerType];
@@ -91,17 +119,16 @@ private:
     ALLEGRO_FONT *font = NULL;
     ALLEGRO_FONT *Medium_font = NULL;
     ALLEGRO_FONT *Large_font = NULL;
-
-    ALLEGRO_EVENT_QUEUE *event_queue = NULL;
-    ALLEGRO_EVENT event;
-    ALLEGRO_TIMER *timer = NULL;
-    ALLEGRO_TIMER *monster_pro = NULL;
-
+    ALLEGRO_DISPLAY* game_display;
+    ALLEGRO_EVENT_QUEUE* event_queue;
     ALLEGRO_SAMPLE *sample = NULL;
     ALLEGRO_SAMPLE_INSTANCE *startSound = NULL;
     ALLEGRO_SAMPLE_INSTANCE *clearSound = NULL;
     ALLEGRO_SAMPLE_INSTANCE *failSound = NULL;
     ALLEGRO_SAMPLE_INSTANCE *backgroundSound = NULL;
+    ALLEGRO_TIMER *timer = NULL;
+    ALLEGRO_TIMER *monster_pro = NULL;
+
     
     LEVEL *level = NULL;
     Menu *menu = NULL;
@@ -111,7 +138,6 @@ private:
 
     int Monster_Pro_Count = 0;
     int Coin_Inc_Count = 0;
-    int mouse_x, mouse_y;
     int selectedTower = -1, lastClicked = -1;
 
     bool redraw = false;

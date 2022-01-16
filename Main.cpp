@@ -2,9 +2,12 @@
 
 int main(int argc, char *argv[])
 {
-    GameWindow *TowerGame= new GameWindow();
     srand(time(NULL));
-    TowerGame->game_play();
+    GameWindow *TowerGame= new GameWindow();
+    TowerGame->game_draw();
+    TowerGame->game_start_event_loop();
+    TowerGame->game_destroy();
+    
     
     delete TowerGame;
     return 0;
