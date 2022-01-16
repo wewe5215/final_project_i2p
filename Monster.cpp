@@ -1,11 +1,12 @@
 #include "Monster.h"
-
+#include<iostream>
+using namespace std;
 const int axis_x[] = {-1, 1, 0, 0};
-const int axis_y[] = {0, 0, -1, 1};
-const char direction_name[][10] = {"LEFT", "RIGHT", "UP", "DOWN"};
+const int axis_y[] = {0, 0, 0, 0};
+const char direction_name[][10] = {"LEFT", "RIGHT"};
 
 // set counter frequency of drawing moving animation
-const int draw_frequency = 10;
+const int draw_frequency = 2000;
 
 Monster::Monster(std::vector<int> path)
 {
@@ -17,15 +18,13 @@ Monster::Monster(std::vector<int> path)
 
     circle = new Circle;
     //circle->x = (path.front() % 15) * grid_width + grid_width/2;
-    //circle->y = (path.front() / 15) * grid_height + grid_height/2;
     circle->x = grid_width/2 + (float)rand() / RAND_MAX * (field_width- grid_width);
-    circle->y = field_height - 50;
+    //circle->y = (path.front() / 15) * grid_height + grid_height/2;
+    circle->y = field_height - 200;
     circle->r = grid_width/2;
 
     direction_count[LEFT] = 1;
     direction_count[RIGHT] = 1;
-    direction_count[UP] = 1;
-    direction_count[DOWN] = 1;
 
     sprite_pos = 0;
     counter = 0;
@@ -53,7 +52,7 @@ Monster::Load_Move()
 {
     char buffer[50];
 
-    for(int i=0; i < 4; i++)
+    for(int i=0; i < 2; i++)
     {
         for(int j=0; j<direction_count[i]; j++)
         {
@@ -100,28 +99,38 @@ Monster::Move()
 
     if(counter == 0)
         sprite_pos = (sprite_pos + 1) % direction_count[direction];
-
-    if(step + 1 < path.size())
+    if(direction == RIGHT && circle->x + grid_width/2 == field_width){
+        cout << "reach the rightmost!" << "\n";
+        direction = LEFT;
+    }
+    if(direction == LEFT && circle->x - grid_width/2 == 0){
+        cout << "reach the leftmost!" << "\n";
+        direction = RIGHT;
+    }
+    /*if(step + 1 < path.size())
     {
         // coordinate of next grid
         target_grid_x = (path[step] % 15) * grid_width + grid_width/2;
-        target_grid_y = (path[step] / 15) * grid_height + grid_height/2;
-
+        target_grid_y = target_grid_y;
         if(circle->x == target_grid_x && circle->y == target_grid_y)
         {
             int cur_grid = path[step];
-            int next_grid = path[step+1];
+            int next_grid = target_grid_x + 20;
             int prev_direction = direction;
-
             switch(direction)
             {
                 case LEFT:
+                    // if reach the left border, turn right
+                    if(next_grid == 0){
+                        cout << "reach the leftmost!" << "\n";
+                        direction = RIGHT;
+                    }
                 case RIGHT:
-                    if(next_grid == cur_grid - 15)
-                        direction = UP;
-                    else if(next_grid == cur_grid + 15)
-                        direction = DOWN;
-
+                    // if reach the right border, turn left
+                    if(next_grid == field_width){
+                        cout << "reach the rightmost!" << "\n";
+                        direction = LEFT;
+                    }
                     break;
                 case UP:
                 case DOWN:
@@ -129,30 +138,27 @@ Monster::Move()
                         direction = LEFT;
                     else if(next_grid == cur_grid + 1)
                         direction = RIGHT;
-
                     break;
-
             }
-
             step++;
-
             if(prev_direction != direction)
                 sprite_pos = 0;
-
+            */
             // reach final grid and set end point
+            /*
             if(step == path.size() - 1){
                 end_x = circle->x + axis_x[direction] * (2 * grid_width);
                 end_y = circle->y + axis_y[direction] * (2 * grid_height);
             }
         }
     }
-
+    */
     // when getting to end point, return true
     if(circle->x == end_x && circle->y == end_y)
         return true;
 
     circle->x += speed * axis_x[direction];
-    circle->y += speed * axis_y[direction];
+    //circle->y += speed * axis_y[direction];
 
     // if not reaching end point, return false
     return false;

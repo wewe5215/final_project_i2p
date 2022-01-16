@@ -1,3 +1,4 @@
+
 #ifndef MONSTER_H_INCLUDED
 #define MONSTER_H_INCLUDED
 
@@ -10,7 +11,7 @@
 #include "Circle.h"
 #include "global.h"
 
-enum {LEFT=0, RIGHT, UP, DOWN};
+enum {LEFT=0, RIGHT};
 
 class Monster: public Object {
 public:
