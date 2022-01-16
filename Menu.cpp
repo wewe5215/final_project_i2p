@@ -83,7 +83,7 @@ Menu::Draw()
     sprintf(buffer, "Score: %d", Score);
     al_draw_text(menuFont, al_map_rgb(255, 255, 255), offsetX, 20 + 2*gapY, 0, buffer);
 
-    for(int i=0; i < Num_TowerType; i++)
+    /*for(int i=0; i < Num_TowerType; i++)
     {
         int pos_x = offsetX + (ThumbWidth + gapX) * (i % 2);
         int pos_y = offsetY + (ThumbHeight + gapY) * (i / 2);
@@ -95,7 +95,7 @@ Menu::Draw()
             al_draw_rectangle(pos_x, pos_y, pos_x + ThumbWidth, pos_y + ThumbHeight, al_map_rgb(255, 0, 0), 0);
         else
             al_draw_rectangle(pos_x, pos_y, pos_x + ThumbWidth, pos_y + ThumbHeight, al_map_rgb(255, 255, 255), 0);
-    }
+    }*/
 }
 
 int

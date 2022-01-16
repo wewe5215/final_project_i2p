@@ -34,7 +34,6 @@
     // TODO: Declare a new scene id.
     , SCENE_SETTINGS = 3,SCENE_GAME_OVER=4,SCENE_WIN=5,SCENE_PALSE=6,SCENE_RANK=7,SCENE_INTRO=8
 };/*
-
 /* Input states */
 
 // The active scene id.

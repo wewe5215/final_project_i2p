@@ -256,6 +256,8 @@ GameWindow::GameWindow()
     al_register_event_source(event_queue, al_get_timer_event_source(monster_pro));
 
     game_init();
+    al_start_timer(timer);
+    al_start_timer(monster_pro);
 }
 
 void
@@ -268,8 +270,7 @@ GameWindow::game_begin()
     while(al_get_sample_instance_playing(startSound));
     al_play_sample_instance(backgroundSound);
 
-    al_start_timer(timer);
-    al_start_timer(monster_pro);
+    
 }
 
 int
@@ -560,7 +561,7 @@ GameWindow::draw_running_map()
     al_clear_to_color(al_map_rgb(100, 100, 100));
     al_draw_bitmap(background, 0, 0, 0);
     //al_draw_bitmap(menu_pic, 0, 0, 0);
-    for(i = 0; i < field_height/40; i++)
+    /*for(i = 0; i < field_height/40; i++)
     {
         for(j = 0; j < field_width/40; j++)
         {
@@ -571,23 +572,22 @@ GameWindow::draw_running_map()
             }
             //al_draw_text(font, al_map_rgb(0, 0, 0), j*40, i*40, ALLEGRO_ALIGN_CENTER, buffer);
         }
-    }
+    }*/
     for(i=0; i<monsterSet.size(); i++)
     {
         monsterSet[i]->Draw();
     }
 
 
-    for(std::list<Tower*>::iterator it = towerSet.begin(); it != towerSet.end(); it++)
+    /*for(std::list<Tower*>::iterator it = towerSet.begin(); it != towerSet.end(); it++)
         (*it)->Draw();
 
     if(selectedTower != -1)
         Tower::SelectedTower(mouse_x, mouse_y, selectedTower);
 
-    al_draw_filled_rectangle(field_width, 0, window_width, window_height, al_map_rgb(100, 100, 100));
+    al_draw_filled_rectangle(field_width, 0, window_width, window_height, al_map_rgb(100, 100, 100));*/
 
     menu->Draw();
 
     al_flip_display();
 }
-

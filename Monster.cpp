@@ -16,8 +16,10 @@ Monster::Monster(std::vector<int> path)
     direction = RIGHT;
 
     circle = new Circle;
-    circle->x = (path.front() % 15) * grid_width + grid_width/2;
-    circle->y = (path.front() / 15) * grid_height + grid_height/2;
+    //circle->x = (path.front() % 15) * grid_width + grid_width/2;
+    //circle->y = (path.front() / 15) * grid_height + grid_height/2;
+    circle->x = grid_width/2 + (float)rand() / RAND_MAX * (field_width- grid_width);
+    circle->y = field_height - 50;
     circle->r = grid_width/2;
 
     direction_count[LEFT] = 1;
