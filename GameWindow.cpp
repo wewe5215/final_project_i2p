@@ -31,7 +31,7 @@ GameWindow::game_init()
     char buffer[50];
 
     icon = al_load_bitmap("./icon.png");
-    background = al_load_bitmap("./StartBackground.jpg");
+    background = al_load_bitmap("./StartBackground.png");
     menu_pic = al_load_bitmap("./menu.png");
     start_button1 = al_load_bitmap("./start-button_1.jpg");
     start_button2 = al_load_bitmap("./start-button_2.jpg");
