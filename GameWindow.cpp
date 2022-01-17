@@ -195,23 +195,7 @@ void GameWindow::game_update(void) {
     if (active_scene == SCENE_START) {
         unsigned int i, j;
     std::list<Tower*>::iterator it;
-        /*player->vx = 0;
-        
-        if (key_state[ALLEGRO_KEY_LEFT] || key_state[ALLEGRO_KEY_A])
-            player->vx -= player->speed;
-        if (key_state[ALLEGRO_KEY_RIGHT] || key_state[ALLEGRO_KEY_D])
-            player->vx += player->speed;
-        // 0.71 is (1/sqrt(2)).
-        
-        player->x += player->vx;
-        // [HACKATHON 1-1]
-        // TODO: Limit the plane's collision box inside the frame.
-        //       (x, y axes can be separated.)
-        // Uncomment and fill in the code below.
-        if (player->x -0 - player->w/2 < 0)
-            player->x = (player->w)/2;
-        else if (player->x + player->w/2 > field_width)
-            player->x = -(player->w)/2;*/
+
     /*TODO:*/
     /*Allow towers to detect if monster enters its range*/
     /*Hint: Tower::DetectAttack*/
@@ -280,20 +264,6 @@ void GameWindow::game_draw(void) {
         al_play_sample_instance(startSound);
         while(al_get_sample_instance_playing(startSound));
             al_play_sample_instance(backgroundSound);
-        /*if(role == 1){
-            player->img = role1;
-        }
-        else if(role == 2){
-            player->img = role2;
-        }
-        else if(role == 3){
-            player->img = role3;
-        }
-        else if(role == 4){
-            player->img = role4;
-        }
-        
-        draw_movable_object(player);*/
         for(int i=0; i<monsterSet.size(); i++)
         {
             monsterSet[i]->Draw();
@@ -404,49 +374,6 @@ void GameWindow::game_change_scene(int next_scene) {
     }
     else if (active_scene == SCENE_START)
     {
-        /*if(role == 1){
-            player->attack = 20;
-            player->hp = 300;
-            player->mp = 400;
-            player->vx = 0;
-            player->x = 400;
-            player->y = 300;
-            player->defence = 200;
-            player->speed = 5;
-        }
-        else if(role == 2){
-            player->attack = 20;
-            player->hp = 300;
-            player->mp = 400;
-            player->vx = 0;
-            player->x = 400;
-            player->y = 300;
-            player->defence = 200;
-            player->speed = 5;
-        }
-        else if(role == 3){
-            player->attack = 20;
-            player->hp = 300;
-            player->mp = 400;
-            player->vx = 0;
-            player->x = 400;
-            player->y = 300;
-            player->defence = 200;
-            player->speed = 5;
-        }
-        else if(role == 4){
-            player->attack = 20;
-            player->hp = 300;
-            player->mp = 400;
-            player->vx = 0;
-            player->x = 400;
-            player->y = 300;
-            player->defence = 200;
-            player->speed = 5;
-        }
-        player->w = al_get_bitmap_width(player->img);
-        player->h = al_get_bitmap_height(player->img);*/
-        //al_draw_bitmap(player->img, 30, 300, 0);
         if(Monster_Pro_Count == 0) {
                 Monster *m = create_monster();
 
@@ -510,11 +437,12 @@ void GameWindow::on_mouse_down(int btn, int x, int y) {
     }
 }
 
-void GameWindow::draw_movable_object(MovableObject* obj) {
-    
-    al_draw_bitmap(obj->img, 30, 30, 0);
+/*void GameWindow::draw_movable_object(MovableObject obj) {
+    if (obj.hidden)
+        return;
+    al_draw_bitmap(obj.img, round(obj.x - obj.w / 2), round(obj.y - obj.h / 2), 0);
 }
-ALLEGRO_BITMAP *GameWindow::load_bitmap_resized(const char *filename, int w, int h) {
+ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h) {
     ALLEGRO_BITMAP* loaded_bmp = al_load_bitmap(filename);
     ALLEGRO_BITMAP *resized_bmp = al_create_bitmap(w, h);
     ALLEGRO_BITMAP *prev_target = al_get_target_bitmap();
@@ -527,7 +455,7 @@ ALLEGRO_BITMAP *GameWindow::load_bitmap_resized(const char *filename, int w, int
     al_set_target_bitmap(prev_target);
     al_destroy_bitmap(loaded_bmp);
     return resized_bmp;
-}
+}*/
 
 
 bool GameWindow::pnt_in_rect(int px, int py, int x, int y, int w, int h) {
