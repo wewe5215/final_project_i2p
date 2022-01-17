@@ -46,7 +46,7 @@ const float FPS = 60;
 // total number of level
 const int LevelNum = 4;
 const float MAX_COOLDOWN = 0.2f;
-//double last_shoot_timestamp_player;
+
 // 1 coin every 2 seconds
 const int CoinSpeed = FPS * 2;
 const int Coin_Time_Gain = 1;
@@ -115,6 +115,12 @@ public:
     bool initial = true;
     int active_scene;
     int role = 1;
+    int score;
+    double last_shoot_timestamp_player = 0;
+    //double last_shoot_timestamp_enemy;
+    //double last_shoot_timestamp_flighter;
+    //double last_shoot_timestamp_monster1;
+    //double last_shoot_timestamp_monster2;
     // Keyboard state, whether the key is down or not.
     bool key_state[ALLEGRO_KEY_MAX];
     // Mouse state, whether the key is down or not.
@@ -124,6 +130,7 @@ public:
     int mouse_x, mouse_y;
     MovableObject player;
     MovableObject player_attack[MAX_BULLET];
+    MovableObject enemy1;
     //MovableObject* player;
     enum {
     SCENE_MENU = 1,
@@ -149,6 +156,7 @@ private:
     ALLEGRO_BITMAP *role3_tool;
     ALLEGRO_BITMAP *role4_tool;
     ALLEGRO_BITMAP *home_pic;
+    ALLEGRO_BITMAP *enemy1_pic;
     ALLEGRO_DISPLAY* display = NULL;
     ALLEGRO_FONT *font = NULL;
     ALLEGRO_FONT *Medium_font = NULL;

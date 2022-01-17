@@ -84,11 +84,12 @@ void GameWindow::game_init(void) {
     role3_tool = al_load_bitmap("./role3_tool.png");
     role4_tool = al_load_bitmap("./role4_tool.png");
     home_pic = al_load_bitmap("./home.png");
-    for(int i = 0; i < Num_TowerType; i++)
+    enemy1_pic = al_load_bitmap("./enemy1.png");
+    /*for(int i = 0; i < Num_TowerType; i++)
     {
         sprintf(buffer, "./Tower/%s.png", TowerClass[i]);
         tower[i] = al_load_bitmap(buffer);
-    }
+    }*/
 
     al_set_display_icon(display, icon);
     al_reserve_samples(3);
@@ -231,10 +232,11 @@ void GameWindow::game_update(void) {
             if (player_attack[i].x< 0||player_attack[i].y<0)
                 player_attack[i].hidden = true;
         }
-        if (key_state[ALLEGRO_KEY_R]) {
+        double now1 = al_get_time();
+        if (key_state[ALLEGRO_KEY_R] && now1 - last_shoot_timestamp_player >= MAX_COOLDOWN) {
             for (i = 0; i<MAX_BULLET;i++) {
                if (player_attack[i].hidden==true) {
-                    
+                    last_shoot_timestamp_player = now1;
                     player_attack[i].hidden = false;
                     player_attack[i].x = player.x + player.w/2;
                     player_attack[i].y = player.y;
@@ -243,10 +245,10 @@ void GameWindow::game_update(void) {
                 }
             }
         }
-        else if (key_state[ALLEGRO_KEY_L]) {
+        else if (key_state[ALLEGRO_KEY_L]&& now1 - last_shoot_timestamp_player >= MAX_COOLDOWN) {
             for (i = 0; i<MAX_BULLET;i++) {
                if (player_attack[i].hidden==true) {
-                    
+                    last_shoot_timestamp_player = now1;
                     player_attack[i].hidden = false;
                     player_attack[i].x = player.x - player.w/2;
                     player_attack[i].y = player.y;
@@ -254,13 +256,36 @@ void GameWindow::game_update(void) {
                 }
             }
         }
-
-    /*TODO:*/
-    /*Allow towers to detect if monster enters its range*/
-    /*Hint: Tower::DetectAttack*/
-
-    // update every monster
-    // check if it is destroyed or reaches end point
+        for(int i=0;i<MAX_BULLET;i++)
+        {
+            for(int j=0;j<2;j++)
+            {
+                if(player_attack[i].hidden || enemy1.hidden) continue;
+                if((player_attack[i].y-(player_attack[i].h)/2<=enemy1.y+(enemy1.h)/2
+                    &&player_attack[i].y+(player_attack[i].h)/2>=enemy1.y-(enemy1.h)/2)
+                   &&(player_attack[i].x<=enemy1.x+enemy1.w/2
+                      &&player_attack[i].x>=enemy1.x-enemy1.w/2))
+               {
+                   enemy1.hp-=player_attack[i].attack;
+                   
+                   score+=player_attack[i].attack;
+                   if(enemy1.hp<=0)
+                   {
+                       enemy1.hidden=true;
+                       
+                       
+                   }
+                   player_attack[i].hidden=true;
+               }
+            }
+            
+        }
+        if(player.hp <= 0){
+            player.hp = player.full_hp;
+            game_change_scene(SCENE_HOME);
+            
+        }
+            
     /*for(i=0; i < monsterSet.size(); i++)
     {
         bool isDestroyed = false, isReachEnd = false;
@@ -344,29 +369,12 @@ void GameWindow::game_draw(void) {
         al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 200, 100, 0, buffer);
         sprintf(buffer, "mp : %d",player.mp);
         al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 300, 100, 0, buffer);
-        if(role == 1){
-            player.img = role1;
-            player.img_tool = role1_tool;
-        }
-        else if(role == 2){
-            player.img = role2;
-            player.img_tool = role2_tool;
-        }
-        else if(role == 3){
-            player.img = role3;
-            player.img_tool = role2_tool;
-           
-        }
-        else if(role == 4){
-            player.img = role4;
-            player.img_tool = role3_tool;
-        }
-        
         draw_movable_object(player);
         for(int i = 0;i < MAX_BULLET;i++){
             player_attack[i].img = player.img_tool;
             draw_movable_object(player_attack[i]);
         }
+        draw_movable_object(enemy1);
         /*for(int i=0; i<monsterSet.size(); i++)
         {
             monsterSet[i]->Draw();
@@ -488,6 +496,8 @@ void GameWindow::game_change_scene(int next_scene) {
     else if (active_scene == SCENE_START)
     {
         if(role == 1){
+            player.img = role1;
+            player.img_tool = role1_tool;
             player.attack = 20;
             player.full_hp = 300;
             player.full_mp = 400;
@@ -512,6 +522,8 @@ void GameWindow::game_change_scene(int next_scene) {
             }
         }
         else if(role == 2){
+            player.img = role2;
+            player.img_tool = role2_tool;
             player.attack = 20;
             player.full_hp = 300;
             player.full_mp = 400;
@@ -530,11 +542,11 @@ void GameWindow::game_change_scene(int next_scene) {
                 player_attack[i].w = al_get_bitmap_width(role2_tool);
                 player_attack[i].h = al_get_bitmap_height(role2_tool);
                 player_attack[i].vx = -3;
-                player_attack[i].x = player.x;
-                player_attack[i].y = player.y;
             }
         }
         else if(role == 3){
+            player.img = role3;
+            player.img_tool = role2_tool;
             player.attack = 20;
             player.full_hp = 300;
             player.full_mp = 400;
@@ -553,11 +565,11 @@ void GameWindow::game_change_scene(int next_scene) {
                 player_attack[i].w = al_get_bitmap_width(role3_tool);
                 player_attack[i].h = al_get_bitmap_height(role3_tool);
                 player_attack[i].vx = -3;
-                player_attack[i].x = player.x;
-                player_attack[i].y = player.y;
             }
         }
         else if(role == 4){
+            player.img = role4;
+            player.img_tool = role3_tool;
             player.attack = 20;
             player.full_hp = 300;
             player.full_mp = 400;
@@ -576,11 +588,17 @@ void GameWindow::game_change_scene(int next_scene) {
                 player_attack[i].w = al_get_bitmap_width(role4_tool);
                 player_attack[i].h = al_get_bitmap_height(role4_tool);
                 player_attack[i].vx = -3;
-                player_attack[i].x = player.x;
-                player_attack[i].y = player.y;
             }
         }
+        enemy1.img=enemy1_pic;
+        enemy1.x=window_width/2;
+        enemy1.y=20;
         
+        enemy1.w=al_get_bitmap_width(enemy1.img);
+        enemy1.h=al_get_bitmap_height(enemy1.img);
+        enemy1.hp=50;
+        enemy1.attack=20;
+        enemy1.hidden=true;
         /*if(Monster_Pro_Count == 0) {
                 Monster *m = create_monster();
 
