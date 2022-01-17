@@ -29,19 +29,14 @@
 #define GAME_TERMINATE 4
 #define GAME_EXIT 5
 #define MAX_BULLET 4
-/*enum {
-    SCENE_MENU = 1,
-    SCENE_START = 2
-    // [HACKATHON 3-7]
-    // TODO: Declare a new scene id.
-    , SCENE_SETTINGS = 3,SCENE_GAME_OVER=4,SCENE_WIN=5,SCENE_PALSE=6,SCENE_RANK=7,SCENE_INTRO=8
-};/*
-/* Input states */
+#define MAX_ENEMY1 10
+#define MAX_ENEMY2 8
+#define MAX_ENEMY3 5
 
 // The active scene id.
 
 // clock rate
-const float FPS = 60;
+const float FPS = 100000;
 
 // total number of level
 const int LevelNum = 4;
@@ -75,7 +70,7 @@ public:
     // constructor
     GameWindow();
     // each process of scene
-    
+
 // Initialize variables and resources.
 // Allows the game to perform any initialization it needs before
 // starting to run.
@@ -130,7 +125,9 @@ public:
     int mouse_x, mouse_y;
     MovableObject player;
     MovableObject player_attack[MAX_BULLET];
-    MovableObject enemy1;
+    MovableObject enemy1[MAX_ENEMY1];
+    MovableObject enemy2[MAX_ENEMY2];
+    MovableObject enemy3[MAX_ENEMY3];
     //MovableObject* player;
     enum {
     SCENE_MENU = 1,
@@ -157,6 +154,8 @@ private:
     ALLEGRO_BITMAP *role4_tool;
     ALLEGRO_BITMAP *home_pic;
     ALLEGRO_BITMAP *enemy1_pic;
+    ALLEGRO_BITMAP *enemy2_pic;
+    ALLEGRO_BITMAP *enemy3_pic;
     ALLEGRO_DISPLAY* display = NULL;
     ALLEGRO_FONT *font = NULL;
     ALLEGRO_FONT *Medium_font = NULL;
@@ -170,8 +169,9 @@ private:
     ALLEGRO_SAMPLE_INSTANCE *backgroundSound = NULL;
     ALLEGRO_TIMER *timer = NULL;
     ALLEGRO_TIMER *monster_pro = NULL;
+    ALLEGRO_TIMER* game_update_timer;
 
-    
+
     LEVEL *level = NULL;
     Menu *menu = NULL;
 

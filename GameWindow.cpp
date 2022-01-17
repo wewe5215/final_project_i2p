@@ -32,6 +32,7 @@ GameWindow::GameWindow()
     display = al_create_display(window_width, window_height);
     event_queue = al_create_event_queue();
 
+    game_update_timer = al_create_timer(1.0f / FPS);
     timer = al_create_timer(1.0f/ FPS);
     monster_pro = al_create_timer(1.0 / FPS);
 
@@ -58,14 +59,14 @@ GameWindow::GameWindow()
     al_register_event_source(event_queue, al_get_display_event_source(display));
     al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_mouse_event_source());
-
+    al_register_event_source(event_queue, al_get_timer_event_source(game_update_timer));
     al_register_event_source(event_queue, al_get_timer_event_source(timer));
     al_register_event_source(event_queue, al_get_timer_event_source(monster_pro));
 
     game_init();
     al_start_timer(timer);
+    al_start_timer(game_update_timer);
     al_start_timer(monster_pro);
-    
 }
 
 void GameWindow::game_init(void) {
@@ -85,6 +86,8 @@ void GameWindow::game_init(void) {
     role4_tool = al_load_bitmap("./role4_tool.png");
     home_pic = al_load_bitmap("./home.png");
     enemy1_pic = al_load_bitmap("./enemy1.png");
+    enemy2_pic = al_load_bitmap("./enemy2.png");
+    enemy3_pic = al_load_bitmap("./enemy3.png");
     /*for(int i = 0; i < Num_TowerType; i++)
     {
         sprintf(buffer, "./Tower/%s.png", TowerClass[i]);
@@ -108,41 +111,7 @@ void GameWindow::game_init(void) {
     game_reset();
     active_scene = SCENE_MENU;
 }
-Monster*
-GameWindow::create_monster()
-{
-    Monster *m = NULL;
-    if(level->MonsterNum[EMERALD]){
-        level->MonsterNum[EMERALD]--;
-        m = new Emerald(level->ReturnPath());
-    }
-    if(level->MonsterNum[WOLF])
-    {
-        level->MonsterNum[WOLF]--;
-        m = new Wolf(level->ReturnPath());
-    }
-    else if(level->MonsterNum[WOLFKNIGHT])
-    {
-        level->MonsterNum[WOLFKNIGHT]--;
-        m = new WolfKnight(level->ReturnPath());
-    }
-    else if(level->MonsterNum[DEMONNIJIA])
-    {
-        level->MonsterNum[DEMONNIJIA]--;
-        m = new DemonNijia(level->ReturnPath());
-    }
-    else if(level->MonsterNum[CAVEMAN])
-    {
-        level->MonsterNum[CAVEMAN]--;
-        m = new CaveMan(level->ReturnPath());
-    }
-    else
-    {
-        al_stop_timer(monster_pro);
-    }
 
-    return m;
-}
 void GameWindow::game_start_event_loop(void) {
     bool done = false;
     ALLEGRO_EVENT event;
@@ -150,30 +119,30 @@ void GameWindow::game_start_event_loop(void) {
     while (!done) {
         al_wait_for_event(event_queue, &event);
         if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-            
+
             done = true;
         } else if (event.type == ALLEGRO_EVENT_TIMER) {
             // Event for redrawing the display.
-            if (event.timer.source == timer)
+            if (event.timer.source == game_update_timer)
                 // The redraw timer has ticked.
                 redraws++;
         } else if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
             // Event for keyboard key down.
-            
+
             key_state[event.keyboard.keycode] = true;
             on_key_down(event.keyboard.keycode);
         } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
             // Event for keyboard key up.
-            
+
             key_state[event.keyboard.keycode] = false;
         } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
             // Event for mouse key down.
-            
+
             mouse_state[event.mouse.button] = true;
             on_mouse_down(event.mouse.button, event.mouse.x, event.mouse.y);
         } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
             // Event for mouse key up.
-            
+
             mouse_state[event.mouse.button] = false;
         } else if (event.type == ALLEGRO_EVENT_MOUSE_AXES) {
             if (event.mouse.dx != 0 || event.mouse.dy != 0) {
@@ -183,7 +152,7 @@ void GameWindow::game_start_event_loop(void) {
                 mouse_y = event.mouse.y;
             } else if (event.mouse.dz != 0) {
                 // Event for mouse scroll.
-                
+
             }
         }
         // TODO: Process more events and call callbacks by adding more
@@ -191,8 +160,6 @@ void GameWindow::game_start_event_loop(void) {
 
         // Redraw
         if (redraws > 0 && al_is_event_queue_empty(event_queue)) {
-            if (redraws > 1)
-            
             // Update and draw the next frame.
             game_update();
             game_draw();
@@ -207,11 +174,11 @@ void GameWindow::game_update(void) {
     std::list<Tower*>::iterator it;
        char buffer[100];
         player.vx = 0;
-        
+
         if (key_state[ALLEGRO_KEY_LEFT])
-            player.vx -= 10;
+            player.vx -= 1;
         if (key_state[ALLEGRO_KEY_RIGHT])
-            player.vx += 10;
+            player.vx += 1;
         // 0.71 is (1/sqrt(2)).
         //player.y += player.vy * 4 * (player.vx ? 0.71f : 1);
         player.x += player.vx * 4 * 1;
@@ -223,106 +190,141 @@ void GameWindow::game_update(void) {
             player.x = (player.w)/2;
         else if (player.x + player.w/2 > window_width)
             player.x = window_width-(player.w)/2;
+        for(int i = 0; i < MAX_ENEMY1; i++){
+            if(enemy1[i].hidden){
+				enemy1[i].hidden=false;
+			}
+				else{
+				enemy1[i].x += enemy1[i].vx * ( i % 2 ? 1 : -1);
+				if(enemy1[i].x < 0 || enemy1[i].x > window_width)
+					enemy1[i].vx *= -1;
+				}
+        }
+         for(int i = 0; i < MAX_ENEMY2; i++){
+            if(enemy2[i].hidden){
+				enemy2[i].hidden=false;
+			}
+				else{
+				enemy2[i].x += enemy2[i].vx * ( i % 2 ? 1 : -1);
+				if(enemy2[i].x < 0 || enemy2[i].x > window_width)
+					enemy2[i].vx *= -1;
+				}
+        }
+         for(int i = 0; i < MAX_ENEMY3; i++){
+            if(enemy3[i].hidden){
+				enemy3[i].hidden=false;
+			}
+				else{
+				enemy3[i].x += enemy3[i].vx * ( i % 2 ? 1 : -1);
+				if(enemy3[i].x < 0 || enemy3[i].x > window_width)
+					enemy3[i].vx *= -1;
+				}
+        }
         for (int i=0;i<MAX_BULLET;i++)
         {
             if (player_attack[i].hidden==true)
                 continue;
             player_attack[i].x += player_attack[i].vx;
-            
+
             if (player_attack[i].x< 0||player_attack[i].y<0)
                 player_attack[i].hidden = true;
         }
         double now1 = al_get_time();
-        if (key_state[ALLEGRO_KEY_R] && now1 - last_shoot_timestamp_player >= MAX_COOLDOWN) {
+        if ((key_state[ALLEGRO_KEY_R]||key_state[ALLEGRO_KEY_L] )&& now1 - last_shoot_timestamp_player >= MAX_COOLDOWN) {
             for (i = 0; i<MAX_BULLET;i++) {
                if (player_attack[i].hidden==true) {
                     last_shoot_timestamp_player = now1;
                     player_attack[i].hidden = false;
-                    player_attack[i].x = player.x + player.w/2;
+                    if(key_state[ALLEGRO_KEY_R])
+                        player_attack[i].x = player.x + player.w/2;
+                    else
+                        player_attack[i].x = player.x - player.w/2;
                     player_attack[i].y = player.y;
-                    
+
                     break;
                 }
             }
         }
-        else if (key_state[ALLEGRO_KEY_L]&& now1 - last_shoot_timestamp_player >= MAX_COOLDOWN) {
-            for (i = 0; i<MAX_BULLET;i++) {
-               if (player_attack[i].hidden==true) {
-                    last_shoot_timestamp_player = now1;
-                    player_attack[i].hidden = false;
-                    player_attack[i].x = player.x - player.w/2;
-                    player_attack[i].y = player.y;
-                    break;
-                }
-            }
-        }
+        
         for(int i=0;i<MAX_BULLET;i++)
         {
-            for(int j=0;j<2;j++)
+            for(int j=0;j<MAX_ENEMY1;j++)
             {
-                if(player_attack[i].hidden || enemy1.hidden) continue;
-                if((player_attack[i].y-(player_attack[i].h)/2<=enemy1.y+(enemy1.h)/2
-                    &&player_attack[i].y+(player_attack[i].h)/2>=enemy1.y-(enemy1.h)/2)
-                   &&(player_attack[i].x<=enemy1.x+enemy1.w/2
-                      &&player_attack[i].x>=enemy1.x-enemy1.w/2))
+                if(player_attack[i].hidden || enemy1[j].hidden) continue;
+                if((player_attack[i].y-(player_attack[j].h)/2<=enemy1[j].y+(enemy1[j].h)/2
+                    &&player_attack[i].y+(player_attack[j].h)/2>=enemy1[j].y-(enemy1[j].h)/2)
+                   &&(player_attack[i].x<=enemy1[j].x+enemy1[j].w/2
+                      &&player_attack[i].x>=enemy1[j].x-enemy1[j].w/2))
                {
-                   enemy1.hp-=player_attack[i].attack;
-                   
+                   enemy1[j].hp-=player_attack[i].attack;
+
                    score+=player_attack[i].attack;
-                   if(enemy1.hp<=0)
+                   if(enemy1[j].hp<=0)
                    {
-                       enemy1.hidden=true;
-                       
-                       
+                       enemy1[j].hidden=true;
+
+
                    }
                    player_attack[i].hidden=true;
                }
             }
-            
         }
+                for(i = 0; i < MAX_ENEMY1; i++){
+			if(enemy1[i].hidden)
+        		continue;
+        	if( enemy1[i].x - enemy1[i].w / 2 <= player.x + player.w / 2 && enemy1[i].x + enemy1[i].w/3 >= player.x - player.w / 2){
+        		if( enemy1[i].y - enemy1[i].h / 2<= player.y + player.h / 2 && enemy1[i].y + enemy1[i].h / 2 >= player.y - player.h / 2){
+        			enemy1[i].hidden = true;
+					if(player.defence - enemy1[i].attack <= 0){
+                        player.hp -= (enemy1[i].attack - player.defence);
+        			}
+        			else{
+                        player.defence -= enemy1[i].attack;
+        			}
+				}
+			}
+		}
+		for(i = 0; i < MAX_ENEMY2; i++){
+			if(enemy2[i].hidden)
+        		continue;
+        	if( enemy2[i].x - enemy2[i].w / 2 <= player.x + player.w / 2 && enemy2[i].x + enemy2[i].w/3 >= player.x - player.w / 2){
+        		if( enemy2[i].y - enemy2[i].h / 2<= player.y + player.h / 2 && enemy2[i].y + enemy2[i].h / 2 >= player.y - player.h / 2){
+        			enemy2[i].hidden = true;
+        			if(player.defence - enemy2[i].attack <= 0){
+                        player.hp -= (enemy2[i].attack - player.defence);
+        			}
+        			else{
+                        player.defence -= enemy2[i].attack;
+        			}
+				}
+			}
+		}
+		for(i = 0; i < MAX_ENEMY3; i++){
+			if(enemy3[i].hidden)
+        		continue;
+        	if( enemy3[i].x - enemy3[i].w / 2 <= player.x + player.w / 2 && enemy3[i].x + enemy3[i].w/3 >= player.x - player.w / 2){
+        		if( enemy3[i].y - enemy3[i].h / 2<= player.y + player.h / 2 && enemy3[i].y + enemy3[i].h / 2 >= player.y - player.h / 2){
+        			enemy3[i].hidden = true;
+					if(player.defence - enemy2[i].attack <= 0){
+                        player.hp -= (enemy3[i].attack - player.defence);
+        			}
+        			else{
+                        player.defence -= enemy3[i].attack;
+        			}
+				}
+			}
+		}
         if(player.hp <= 0){
             player.hp = player.full_hp;
             game_change_scene(SCENE_HOME);
-            
-        }
-            
-    /*for(i=0; i < monsterSet.size(); i++)
-    {
-        bool isDestroyed = false, isReachEnd = false;
-
-        
-
-        isReachEnd = monsterSet[i]->Move();
-
-        if(isDestroyed)
-        {
-            Monster *m = monsterSet[i];
-
-            menu->Change_Coin(m->getWorth());
-            menu->Gain_Score(m->getScore());
-            monsterSet.erase(monsterSet.begin() + i);
-            i--;
-            delete m;
 
         }
-        else if(isReachEnd)
-        {
-            Monster *m = monsterSet[i];
 
-            if(menu->Subtract_HP())
-                game_change_scene(4);
 
-            monsterSet.erase(monsterSet.begin() + i);
-            i--;
-            delete m;
-        }
-    }*/
-        
-        
     }
     else if(active_scene == SCENE_HOME){
         player.vx = 0;
-        
+
         if (key_state[ALLEGRO_KEY_LEFT])
             player.vx -= 1;
         if (key_state[ALLEGRO_KEY_RIGHT])
@@ -354,33 +356,41 @@ void GameWindow::game_draw(void) {
         sprintf(buffer, "PRESS S TO SETTING");
         al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 20, 20 + 2*gapY, 0, buffer);
     }
-//    
+//
     else if (active_scene == SCENE_START) {
-        
-        al_clear_to_color(al_map_rgb(100, 100, 100));
-        al_draw_bitmap(background, 0, 0, 0);
 
-        al_play_sample_instance(startSound);
-        while(al_get_sample_instance_playing(startSound));
-            al_play_sample_instance(backgroundSound);
-        sprintf(buffer, "hp : %d",player.hp);
-        //printf("%d\n",player.hp);
-        //printf("%d\n",player.mp);
-        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 200, 100, 0, buffer);
-        sprintf(buffer, "mp : %d",player.mp);
-        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 300, 100, 0, buffer);
+        //al_clear_to_color(al_map_rgb(100, 100, 100));
+        al_draw_bitmap(home_pic, 0, 0, 0);
+
+        //al_play_sample_instance(startSound);
+        //while(al_get_sample_instance_playing(startSound));
+          //  al_play_sample_instance(backgroundSound);
         
+
         for(int i = 0;i < MAX_BULLET;i++){
             player_attack[i].img = player.img_tool;
             draw_movable_object(player_attack[i]);
         }
         draw_movable_object(player);
-        draw_movable_object(enemy1);
+        for(int i = 0; i < MAX_ENEMY1; i++){
+            draw_movable_object(enemy1[i]);
+        }
+        for(int i = 0; i < MAX_ENEMY2; i++){
+            draw_movable_object(enemy2[i]);
+        }
+         for(int i = 0; i < MAX_ENEMY3; i++){
+            draw_movable_object(enemy3[i]);
+        }
         /*for(int i=0; i<monsterSet.size(); i++)
         {
             monsterSet[i]->Draw();
         }*/
-
+        sprintf(buffer, "hp : %d",player.hp);
+                //printf("%d\n",player.hp);
+                //printf("%d\n",player.mp);
+        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 200, 100, 0, buffer);
+        sprintf(buffer, "mp : %d",player.mp);
+        al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 300, 100, 0, buffer);
 
     /*for(std::list<Tower*>::iterator it = towerSet.begin(); it != towerSet.end(); it++)
         (*it)->Draw();
@@ -472,27 +482,20 @@ GameWindow::game_destroy()
 }
 
 void GameWindow::game_change_scene(int next_scene) {
-    
+
     /*if (active_scene == SCENE_MENU) {
-        
-            
-            
-        
     }
     else if (active_scene == SCENE_START) {
-        
     }
     else if (active_scene == SCENE_WIN) {
-       
     }
     else if (active_scene == SCENE_GAME_OVER) {
-        
     }*/
     active_scene = next_scene;
     // TODO: Allocate resources before entering scene.
     if (active_scene == SCENE_MENU)
     {
-        
+
     }
     else if (active_scene == SCENE_START)
     {
@@ -517,9 +520,8 @@ void GameWindow::game_change_scene(int next_scene) {
                 player_attack[i].attack = player.attack;
                 player_attack[i].w = al_get_bitmap_width(role1_tool);
                 player_attack[i].h = al_get_bitmap_height(role1_tool);
-                player_attack[i].vx = -3;
-                player_attack[i].x = player.x;
-                player_attack[i].y = player.y;
+                player_attack[i].vx = -1;
+                
             }
         }
         else if(role == 2){
@@ -591,22 +593,39 @@ void GameWindow::game_change_scene(int next_scene) {
                 player_attack[i].vx = -3;
             }
         }
-        enemy1.img=enemy1_pic;
-        enemy1.x=window_width/2;
-        enemy1.y=20;
-        
-        enemy1.w=al_get_bitmap_width(enemy1.img);
-        enemy1.h=al_get_bitmap_height(enemy1.img);
-        enemy1.hp=50;
-        enemy1.attack=20;
-        enemy1.hidden=true;
-        /*if(Monster_Pro_Count == 0) {
-                Monster *m = create_monster();
-
-                if(m != NULL)
-                    monsterSet.push_back(m);
+        for(int i = 0; i < MAX_ENEMY1; i++){
+            enemy1[i].img=enemy1_pic;
+            enemy1[i].x=enemy1[i].w / 2 + (float)rand() / RAND_MAX * (window_width - enemy1[i].w);
+            enemy1[i].y=20;
+            enemy1[i].vx = 10;
+            enemy1[i].w=al_get_bitmap_width(enemy1[i].img);
+            enemy1[i].h=al_get_bitmap_height(enemy1[i].img);
+            enemy1[i].hp=50;
+            enemy1[i].attack=20;
+            enemy1[i].hidden=true;
         }
-        Monster_Pro_Count = (Monster_Pro_Count + 1) % level->getMonsterSpeed();*/
+        for(int i = 0; i < MAX_ENEMY2; i++){
+            enemy2[i].img=enemy2_pic;
+            enemy2[i].x=enemy2[i].w / 2 + (float)rand() / RAND_MAX * (window_width - enemy2[i].w);
+            enemy2[i].y=40;
+            enemy2[i].vx = 15;
+            enemy2[i].w=al_get_bitmap_width(enemy2[i].img);
+            enemy2[i].h=al_get_bitmap_height(enemy2[i].img);
+            enemy2[i].hp=100;
+            enemy2[i].attack=20;
+            enemy2[i].hidden=true;
+        }
+        for(int i = 0; i < MAX_ENEMY3; i++){
+            enemy3[i].img=enemy3_pic;
+            enemy3[i].x=enemy3[i].w / 2 + (float)rand() / RAND_MAX * (window_width - enemy3[i].w);
+            enemy3[i].y=60;
+            enemy3[i].vx = 20;
+            enemy3[i].w=al_get_bitmap_width(enemy3[i].img);
+            enemy3[i].h=al_get_bitmap_height(enemy3[i].img);
+            enemy3[i].hp=200;
+            enemy3[i].attack=20;
+            enemy3[i].hidden=true;
+        }
     }
     else if(active_scene == SCENE_HOME){
         player.hp = player.full_hp;
@@ -614,15 +633,11 @@ void GameWindow::game_change_scene(int next_scene) {
     }
     /*else if(active_scene==SCENE_WIN)
     {
-        
     }
     else if(active_scene==SCENE_GAME_OVER)
     {
-        
-        
-        
     }*/
-    
+
 }
 
 void GameWindow::on_key_down(int keycode) {
@@ -632,9 +647,9 @@ void GameWindow::on_key_down(int keycode) {
             game_change_scene(SCENE_START);
         else if(keycode == ALLEGRO_KEY_S)
             game_change_scene(SCENE_SETTINGS);
-      
+
     }
-    
+
     // [HACKATHON 3-10]
     // TODO: If active_scene is SCENE_SETTINGS and Backspace is pressed,
     // return to SCENE_MENU.
@@ -652,7 +667,7 @@ void GameWindow::on_key_down(int keycode) {
         else if(keycode == ALLEGRO_KEY_4)
             role = 4;
     }
-    
+
     else if(active_scene == SCENE_START){
         if(keycode == ALLEGRO_KEY_UP)
             game_change_scene(SCENE_HOME);
@@ -661,7 +676,7 @@ void GameWindow::on_key_down(int keycode) {
         if(keycode == ALLEGRO_KEY_UP)
             game_change_scene(SCENE_START);
     }
-    
+
 }
 
 
@@ -675,20 +690,20 @@ void GameWindow::on_mouse_down(int btn, int x, int y) {
               game_change_scene(SCENE_SETTINGS);
           if(pnt_in_rect(mouse_x, mouse_y,0, 50, 200, 91))
               game_change_scene(SCENE_INTRO);
-          
+
       }
     }
 }
 
 void GameWindow::draw_movable_object(MovableObject obj) {
-    
+
     al_draw_bitmap(obj.img, round(obj.x - obj.w / 2), round(obj.y - obj.h / 2), 0);
 }
 ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h) {
     ALLEGRO_BITMAP* loaded_bmp = al_load_bitmap(filename);
     ALLEGRO_BITMAP *resized_bmp = al_create_bitmap(w, h);
     ALLEGRO_BITMAP *prev_target = al_get_target_bitmap();
-    
+
     al_set_target_bitmap(resized_bmp);
     al_draw_scaled_bitmap(loaded_bmp, 0, 0,
         al_get_bitmap_width(loaded_bmp),
