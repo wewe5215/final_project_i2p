@@ -121,6 +121,8 @@ public:
     // Mouse state, whether the key is down or not.
     // 1 is for left, 2 is for right, 3 is for middle.
     bool *mouse_state;
+    int plus_hp;
+    int plus_mp;
     // Mouse position.
     int mouse_x, mouse_y;
     MovableObject player;

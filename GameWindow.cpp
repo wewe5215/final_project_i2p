@@ -262,7 +262,8 @@ void GameWindow::game_update(void) {
                    if(enemy1[j].hp<=0)
                    {
                        enemy1[j].hidden=true;
-
+                        plus_hp++;
+                        plus_mp++;
 
                    }
                    player_attack[i].hidden=true;
@@ -275,6 +276,8 @@ void GameWindow::game_update(void) {
         	if( enemy1[i].x - enemy1[i].w / 2 <= player.x + player.w / 2 && enemy1[i].x + enemy1[i].w/3 >= player.x - player.w / 2){
         		if( enemy1[i].y - enemy1[i].h / 2<= player.y + player.h / 2 && enemy1[i].y + enemy1[i].h / 2 >= player.y - player.h / 2){
         			enemy1[i].hidden = true;
+                    plus_hp++;
+                    plus_mp++;
 					if(player.defence - enemy1[i].attack <= 0){
                         player.hp -= (enemy1[i].attack - player.defence);
         			}
@@ -290,6 +293,8 @@ void GameWindow::game_update(void) {
         	if( enemy2[i].x - enemy2[i].w / 2 <= player.x + player.w / 2 && enemy2[i].x + enemy2[i].w/3 >= player.x - player.w / 2){
         		if( enemy2[i].y - enemy2[i].h / 2<= player.y + player.h / 2 && enemy2[i].y + enemy2[i].h / 2 >= player.y - player.h / 2){
         			enemy2[i].hidden = true;
+                    plus_hp++;
+                    plus_mp++;
         			if(player.defence - enemy2[i].attack <= 0){
                         player.hp -= (enemy2[i].attack - player.defence);
         			}
@@ -305,6 +310,8 @@ void GameWindow::game_update(void) {
         	if( enemy3[i].x - enemy3[i].w / 2 <= player.x + player.w / 2 && enemy3[i].x + enemy3[i].w/3 >= player.x - player.w / 2){
         		if( enemy3[i].y - enemy3[i].h / 2<= player.y + player.h / 2 && enemy3[i].y + enemy3[i].h / 2 >= player.y - player.h / 2){
         			enemy3[i].hidden = true;
+                    plus_hp++;
+                    plus_mp++;
 					if(player.defence - enemy2[i].attack <= 0){
                         player.hp -= (enemy3[i].attack - player.defence);
         			}
@@ -314,6 +321,10 @@ void GameWindow::game_update(void) {
 				}
 			}
 		}
+        if(plus_hp % 3 == 0)
+            player.hp += 5;
+        if(plus_mp % 3 == 0)
+            player.mp += 5;
         if(player.hp <= 0){
             player.hp = player.full_hp;
             game_change_scene(SCENE_HOME);
