@@ -12,14 +12,9 @@
 #include <time.h>
 #include "Menu.h"
 #include "Level.h"
-#include "WolfKnight.h"
-#include "CaveMan.h"
-#include "Wolf.h"
-#include "DemonNijia.h"
-#include "Tower.h"
 #include "Attack.h"
 #include "Slider.h"
-#include "Emerald.h"
+
 //#include "player.h"
 #define GAME_INIT -1
 #define GAME_SETTING 0
@@ -36,7 +31,7 @@
 // The active scene id.
 
 // clock rate
-const float FPS = 100000;
+const float FPS = 40;
 
 // total number of level
 const int LevelNum = 4;
@@ -45,7 +40,9 @@ const float MAX_COOLDOWN = 0.2f;
 // 1 coin every 2 seconds
 const int CoinSpeed = FPS * 2;
 const int Coin_Time_Gain = 1;
-typedef struct {
+
+class MovableObject{
+    public:
     // The center coordinate of the image.
     float x, y;
     // The width and height of the object.
@@ -63,7 +60,7 @@ typedef struct {
     bool hidden;
     ALLEGRO_BITMAP* img;
     ALLEGRO_BITMAP* img_tool;
-} MovableObject;
+} ;
 class GameWindow
 {
 public:
@@ -89,14 +86,7 @@ public:
     void game_destroy(void);
 // Function to change from one scene to another.
     void game_change_scene(int next_scene);
-    Monster* create_monster();
-    //void draw_movable_object(MovableObject* obj);
-// Load resized bitmap and check if failed.
     ALLEGRO_BITMAP *load_bitmap_resized(const char *filename, int w, int h);
-// [HACKATHON 3-2]
-// TODO: Declare a function.
-// Determines whether the point (px, py) is in rect (x, y, w, h).
-// Uncomment the code below.
 bool pnt_in_rect(int px, int py, int x, int y, int w, int h);
 void draw_movable_object(MovableObject obj);
 /* Event callbacks. */
@@ -136,16 +126,13 @@ public:
     SCENE_START = 2
     // [HACKATHON 3-7]
     // TODO: Declare a new scene id.
-    , SCENE_SETTINGS = 3,SCENE_INTRO=4, SCENE_HOME = 5
+    , SCENE_SETTINGS = 3,SCENE_INTRO=4, SCENE_HOME = 5, SCENE_LEVEL2 = 6, SCENE_LEVEL3 = 7, SCENE_BOSS = 8
 };
 private:
     ALLEGRO_BITMAP *icon;
-    ALLEGRO_BITMAP *tower[Num_TowerType];
     ALLEGRO_BITMAP *background = NULL;
     ALLEGRO_BITMAP *menu_pic = NULL;
     ALLEGRO_BITMAP *settings_pic;
-    ALLEGRO_BITMAP *start_button1;
-    ALLEGRO_BITMAP *start_button2;
     ALLEGRO_BITMAP *role1;
     ALLEGRO_BITMAP *role2;
     ALLEGRO_BITMAP *role3;
@@ -171,14 +158,7 @@ private:
     ALLEGRO_SAMPLE_INSTANCE *backgroundSound = NULL;
     ALLEGRO_TIMER *timer = NULL;
     ALLEGRO_TIMER *monster_pro = NULL;
-    ALLEGRO_TIMER* game_update_timer;
 
-
-    LEVEL *level = NULL;
-    Menu *menu = NULL;
-
-    std::vector<Monster*> monsterSet;
-    std::list<Tower*> towerSet;
 
     int Monster_Pro_Count = 0;
     int Coin_Inc_Count = 0;
