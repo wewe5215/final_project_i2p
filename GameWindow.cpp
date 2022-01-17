@@ -32,7 +32,7 @@ GameWindow::GameWindow()
     display = al_create_display(window_width, window_height);
     event_queue = al_create_event_queue();
 
-    timer = al_create_timer(1.0 / FPS);
+    timer = al_create_timer(1.0f/ FPS);
     monster_pro = al_create_timer(1.0 / FPS);
 
     if(timer == NULL || monster_pro == NULL)
@@ -369,11 +369,12 @@ void GameWindow::game_draw(void) {
         al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 200, 100, 0, buffer);
         sprintf(buffer, "mp : %d",player.mp);
         al_draw_text(Medium_font, al_map_rgb(255, 255, 255), 300, 100, 0, buffer);
-        draw_movable_object(player);
+        
         for(int i = 0;i < MAX_BULLET;i++){
             player_attack[i].img = player.img_tool;
             draw_movable_object(player_attack[i]);
         }
+        draw_movable_object(player);
         draw_movable_object(enemy1);
         /*for(int i=0; i<monsterSet.size(); i++)
         {
@@ -438,7 +439,7 @@ GameWindow::game_reset()
     al_stop_sample_instance(startSound);
 
     // stop timer
-    al_stop_timer(timer);
+    //al_stop_timer(timer);
     //al_stop_timer(monster_pro);
 }
 
