@@ -231,10 +231,18 @@ void GameWindow::game_update(void) {
                             enemy1[j].hidden=true;
                                 plus_hp = rand();
                                 plus_mp = rand();
-                                if(plus_hp % 3 == 0)
+                                if(plus_hp % 3 == 0){
+                                    if(player.hp + 5 > player.full_hp)
+                                        player.hp = player.full_hp;
+                                    else   
                                         player.hp += 5;
+                                }
+                                        
                                 if(plus_mp % 3 == 0)
-                                    player.mp += 5;
+                                    if(player.mp + 5 > player.full_mp)
+                                        player.mp = player.full_mp;
+                                    else   
+                                        player.mp += 5;
 
                         }
                         player_attack[i].hidden=true;
@@ -247,7 +255,7 @@ void GameWindow::game_update(void) {
                 if(enemy1[i].hidden)
                     continue;
                 if( enemy1[i].x - enemy1[i].w / 2 <= player.x + player.w / 2 && enemy1[i].x + enemy1[i].w/3 >= player.x - player.w / 2){
-                    if( enemy1[i].y - enemy1[i].h / 2<= player.y + player.h / 2 && enemy1[i].y + enemy1[i].h / 2 >= player.y - player.h / 2){
+                    if( enemy1[i].y - enemy1[i].h / 2<= player.y + player.h / 2 || enemy1[i].y + enemy1[i].h / 2 >= player.y - player.h / 2){
                         enemy1[i].hidden = true;
                         if(player.defence - enemy1[i].attack <= 0){
                             player.hp -= (enemy1[i].attack - player.defence);
@@ -304,10 +312,18 @@ void GameWindow::game_update(void) {
                             enemy2[j].hidden=true;
                                 plus_hp = rand();
                                 plus_mp = rand();
-                                if(plus_hp % 3 == 0)
+                                if(plus_hp % 3 == 0){
+                                    if(player.hp + 5 > player.full_hp)
+                                        player.hp = player.full_hp;
+                                    else   
                                         player.hp += 5;
+                                }
+                                        
                                 if(plus_mp % 3 == 0)
-                                    player.mp += 5;
+                                    if(player.mp + 5 > player.full_mp)
+                                        player.mp = player.full_mp;
+                                    else   
+                                        player.mp += 5;
 
                         }
                         player_attack[i].hidden=true;
