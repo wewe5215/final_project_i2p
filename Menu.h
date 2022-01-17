@@ -45,6 +45,10 @@ private:
     std::vector<ALLEGRO_BITMAP*> menu_tower;
     ALLEGRO_BITMAP *love = NULL;
     ALLEGRO_FONT *menuFont;
+    ALLEGRO_BITMAP *role1;
+    ALLEGRO_BITMAP *role2;
+    ALLEGRO_BITMAP *role3;
+    ALLEGRO_BITMAP *role4;
     int HealthPoint = 10;
     int killedMonster = 0;
     int Score = 0;

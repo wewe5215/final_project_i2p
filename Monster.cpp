@@ -17,10 +17,8 @@ Monster::Monster(std::vector<int> path)
     direction = RIGHT;
 
     circle = new Circle;
-    //circle->x = (path.front() % 15) * grid_width + grid_width/2;
     circle->x = grid_width/2 + (float)rand() / RAND_MAX * (field_width- grid_width);
-    //circle->y = (path.front() / 15) * grid_height + grid_height/2;
-    circle->y = field_height - 200;
+    circle->y = window_height - 200;
     circle->r = grid_width/2;
 
     direction_count[LEFT] = 1;
@@ -28,7 +26,7 @@ Monster::Monster(std::vector<int> path)
 
     sprite_pos = 0;
     counter = 0;
-    strncpy(class_name, "Wolf", 20);
+    strncpy(class_name, "Emerald", 20);
 }
 
 Monster::~Monster()
@@ -103,56 +101,16 @@ Monster::Move()
         cout << "reach the rightmost!" << "\n";
         direction = LEFT;
     }
+    else{
+        circle->x += speed;
+    }
     if(direction == LEFT && circle->x - grid_width/2 == 0){
         cout << "reach the leftmost!" << "\n";
         direction = RIGHT;
     }
-    /*if(step + 1 < path.size())
-    {
-        // coordinate of next grid
-        target_grid_x = (path[step] % 15) * grid_width + grid_width/2;
-        target_grid_y = target_grid_y;
-        if(circle->x == target_grid_x && circle->y == target_grid_y)
-        {
-            int cur_grid = path[step];
-            int next_grid = target_grid_x + 20;
-            int prev_direction = direction;
-            switch(direction)
-            {
-                case LEFT:
-                    // if reach the left border, turn right
-                    if(next_grid == 0){
-                        cout << "reach the leftmost!" << "\n";
-                        direction = RIGHT;
-                    }
-                case RIGHT:
-                    // if reach the right border, turn left
-                    if(next_grid == field_width){
-                        cout << "reach the rightmost!" << "\n";
-                        direction = LEFT;
-                    }
-                    break;
-                case UP:
-                case DOWN:
-                    if(next_grid == cur_grid - 1)
-                        direction = LEFT;
-                    else if(next_grid == cur_grid + 1)
-                        direction = RIGHT;
-                    break;
-            }
-            step++;
-            if(prev_direction != direction)
-                sprite_pos = 0;
-            */
-            // reach final grid and set end point
-            /*
-            if(step == path.size() - 1){
-                end_x = circle->x + axis_x[direction] * (2 * grid_width);
-                end_y = circle->y + axis_y[direction] * (2 * grid_height);
-            }
-        }
+    else{
+        circle->x -= speed;
     }
-    */
     // when getting to end point, return true
     if(circle->x == end_x && circle->y == end_y)
         return true;

@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
+#include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
+#include <stdio.h>
+#include <string.h>
 #include <vector>
 #include <list>
 #include <time.h>
@@ -15,7 +19,8 @@
 #include "Tower.h"
 #include "Attack.h"
 #include "Slider.h"
-
+#include "Emerald.h"
+//#include "player.h"
 #define GAME_INIT -1
 #define GAME_SETTING 0
 #define GAME_MENU 1
@@ -23,6 +28,7 @@
 #define GAME_TURNBACK 3
 #define GAME_TERMINATE 4
 #define GAME_EXIT 5
+#define MAX_BULLET 4
 /*enum {
     SCENE_MENU = 1,
     SCENE_START = 2
@@ -43,21 +49,25 @@ const int LevelNum = 4;
 // 1 coin every 2 seconds
 const int CoinSpeed = FPS * 2;
 const int Coin_Time_Gain = 1;
-/*typedef struct {
+typedef struct {
     // The center coordinate of the image.
-    int x, y;
+    float x, y;
     // The width and height of the object.
-    int w, h;
+    float w, h;
     // The velocity in x, y axes.
-    int vx;
+    float vx;
     // The pointer to the object’s image.
     int hp;
     int mp;
-    int attack;
-    int speed;
-    int defence;
+    float attack;
+    float speed;
+    float defence;
+    int full_hp;
+    int full_mp;
+    bool hidden;
     ALLEGRO_BITMAP* img;
-} MovableObject;*/
+    ALLEGRO_BITMAP* img_tool;
+} MovableObject;
 class GameWindow
 {
 public:
@@ -92,7 +102,7 @@ public:
 // Determines whether the point (px, py) is in rect (x, y, w, h).
 // Uncomment the code below.
 bool pnt_in_rect(int px, int py, int x, int y, int w, int h);
-
+void draw_movable_object(MovableObject obj);
 /* Event callbacks. */
 void on_key_down(int keycode);
 void on_mouse_down(int btn, int x, int y);
@@ -111,14 +121,15 @@ public:
     bool *mouse_state;
     // Mouse position.
     int mouse_x, mouse_y;
-
+    MovableObject player;
+    MovableObject player_attack[MAX_BULLET];
     //MovableObject* player;
     enum {
     SCENE_MENU = 1,
     SCENE_START = 2
     // [HACKATHON 3-7]
     // TODO: Declare a new scene id.
-    , SCENE_SETTINGS = 3,SCENE_GAME_OVER=4,SCENE_WIN=5,SCENE_PALSE=6,SCENE_RANK=7,SCENE_INTRO=8
+    , SCENE_SETTINGS = 3,SCENE_INTRO=4, SCENE_HOME = 5
 };
 private:
     ALLEGRO_BITMAP *icon;
@@ -132,6 +143,11 @@ private:
     ALLEGRO_BITMAP *role2;
     ALLEGRO_BITMAP *role3;
     ALLEGRO_BITMAP *role4;
+    ALLEGRO_BITMAP *role1_tool;
+    ALLEGRO_BITMAP *role2_tool;
+    ALLEGRO_BITMAP *role3_tool;
+    ALLEGRO_BITMAP *role4_tool;
+    ALLEGRO_BITMAP *home_pic;
     ALLEGRO_DISPLAY* display = NULL;
     ALLEGRO_FONT *font = NULL;
     ALLEGRO_FONT *Medium_font = NULL;

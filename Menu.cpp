@@ -30,33 +30,33 @@ Menu::Menu()
 {
     char filename[50];
 
-    HealthPoint = 10;
+    /*HealthPoint = 10;
     Coin = 0;
-    Score = 0;
-
-    for(int i=0;i<Num_TowerType; i++)
+    Score = 0;*/
+    
+    /*for(int i=0;i<Num_TowerType; i++)
     {
         ALLEGRO_BITMAP *tower;
         sprintf(filename, "./Tower/%s_Menu.png", TowerClass[i]);
 
         tower = al_load_bitmap(filename);
         menu_tower.push_back(tower);
-    }
+    }*/
 
-    love = al_load_bitmap("./Tower/love.png");
+    //love = al_load_bitmap("./Tower/love.png");
 
-    menuFont = al_load_ttf_font("pirulen.ttf", 12, 0); // load font
+    //menuFont = al_load_ttf_font("pirulen.ttf", 12, 0); // load font
 }
 
 Menu::~Menu()
 {
-    al_destroy_bitmap(love);
-    al_destroy_font(menuFont);
+    //al_destroy_bitmap(love);
+    //al_destroy_font(menuFont);
 
-    for(int i=0; i < Num_TowerType; i++)
+    /*for(int i=0; i < Num_TowerType; i++)
         al_destroy_bitmap(menu_tower[i]);
 
-    menu_tower.clear();
+    menu_tower.clear();*/
 }
 
 void
@@ -73,15 +73,15 @@ Menu::Draw()
 {
     char buffer[50];
 
-    sprintf(buffer, "%d", HealthPoint);
-    al_draw_bitmap(love, offsetX, 20, 0);
-    al_draw_text(menuFont, al_map_rgb(255, 255, 255), 2*al_get_bitmap_width(love) + offsetX, 20, 0, buffer);
+    //sprintf(buffer, "%d", HealthPoint);
+    //al_draw_bitmap(love, offsetX, 20, 0);
+    //al_draw_text(menuFont, al_map_rgb(255, 255, 255), 2*al_get_bitmap_width(love) + offsetX, 20, 0, buffer);
 
-    sprintf(buffer, "Coin: %d", Coin);
-    al_draw_text(menuFont, al_map_rgb(255, 255, 255), offsetX, 20 + gapY, 0, buffer);
+    //sprintf(buffer, "Coin: %d", Coin);
+    //al_draw_text(menuFont, al_map_rgb(255, 255, 255), offsetX, 20 + gapY, 0, buffer);
 
-    sprintf(buffer, "Score: %d", Score);
-    al_draw_text(menuFont, al_map_rgb(255, 255, 255), offsetX, 20 + 2*gapY, 0, buffer);
+    //sprintf(buffer, "Score: %d", Score);
+    //al_draw_text(menuFont, al_map_rgb(255, 255, 255), offsetX, 20 + 2*gapY, 0, buffer);
 
     /*for(int i=0; i < Num_TowerType; i++)
     {
