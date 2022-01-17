@@ -45,7 +45,8 @@ const float FPS = 60;
 
 // total number of level
 const int LevelNum = 4;
-
+const float MAX_COOLDOWN = 0.2f;
+//double last_shoot_timestamp_player;
 // 1 coin every 2 seconds
 const int CoinSpeed = FPS * 2;
 const int Coin_Time_Gain = 1;

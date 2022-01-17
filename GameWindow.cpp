@@ -102,7 +102,7 @@ void GameWindow::game_init(void) {
     backgroundSound = al_create_sample_instance(sample);
     al_set_sample_instance_playmode(backgroundSound, ALLEGRO_PLAYMODE_ONCE);
     al_attach_sample_instance_to_mixer(backgroundSound, al_get_default_mixer());
-    level = new LEVEL(1);
+    //level = new LEVEL(1);
     //menu = new Menu();
     game_reset();
     active_scene = SCENE_MENU;
@@ -367,10 +367,10 @@ void GameWindow::game_draw(void) {
             player_attack[i].img = player.img_tool;
             draw_movable_object(player_attack[i]);
         }
-        for(int i=0; i<monsterSet.size(); i++)
+        /*for(int i=0; i<monsterSet.size(); i++)
         {
             monsterSet[i]->Draw();
-        }
+        }*/
 
 
     /*for(std::list<Tower*>::iterator it = towerSet.begin(); it != towerSet.end(); it++)
@@ -458,7 +458,7 @@ GameWindow::game_destroy()
     al_destroy_sample_instance(startSound);
     al_destroy_sample_instance(backgroundSound);
 
-    delete level;
+    //delete level;
     //delete menu;
 }
 
@@ -581,13 +581,13 @@ void GameWindow::game_change_scene(int next_scene) {
             }
         }
         
-        if(Monster_Pro_Count == 0) {
+        /*if(Monster_Pro_Count == 0) {
                 Monster *m = create_monster();
 
                 if(m != NULL)
                     monsterSet.push_back(m);
         }
-        Monster_Pro_Count = (Monster_Pro_Count + 1) % level->getMonsterSpeed();
+        Monster_Pro_Count = (Monster_Pro_Count + 1) % level->getMonsterSpeed();*/
     }
     else if(active_scene == SCENE_HOME){
         player.hp = player.full_hp;
