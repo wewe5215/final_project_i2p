@@ -10,8 +10,6 @@
 #include <vector>
 #include <list>
 #include <time.h>
-#include "Menu.h"
-#include "Level.h"
 #include "Attack.h"
 #include "Slider.h"
 
@@ -23,15 +21,15 @@
 #define GAME_TURNBACK 3
 #define GAME_TERMINATE 4
 #define GAME_EXIT 5
-#define MAX_BULLET 4
+#define MAX_BULLET 8
 #define MAX_ENEMY1 10
-#define MAX_ENEMY2 8
-#define MAX_ENEMY3 5
+#define MAX_ENEMY2 10
+#define MAX_ENEMY3 8
 
 // The active scene id.
 
 // clock rate
-const float FPS = 40;
+const float FPS = 30;
 
 // total number of level
 const int LevelNum = 4;
@@ -47,9 +45,8 @@ class MovableObject{
     float x, y;
     // The width and height of the object.
     float w, h;
-    // The velocity in x, y axes.
+    // The velocity in x,
     float vx;
-    // The pointer to the object’s image.
     int hp;
     int mp;
     float attack;
@@ -57,6 +54,8 @@ class MovableObject{
     float defence;
     int full_hp;
     int full_mp;
+    int initx;
+    int inity;
     bool hidden;
     ALLEGRO_BITMAP* img;
     ALLEGRO_BITMAP* img_tool;
@@ -120,6 +119,7 @@ public:
     MovableObject enemy1[MAX_ENEMY1];
     MovableObject enemy2[MAX_ENEMY2];
     MovableObject enemy3[MAX_ENEMY3];
+    MovableObject boss;
     //MovableObject* player;
     enum {
     SCENE_MENU = 1,
@@ -145,6 +145,8 @@ private:
     ALLEGRO_BITMAP *enemy1_pic;
     ALLEGRO_BITMAP *enemy2_pic;
     ALLEGRO_BITMAP *enemy3_pic;
+    ALLEGRO_BITMAP *boss_pic;
+    ALLEGRO_BITMAP *intro_pic;
     ALLEGRO_DISPLAY* display = NULL;
     ALLEGRO_FONT *font = NULL;
     ALLEGRO_FONT *Medium_font = NULL;
@@ -156,14 +158,20 @@ private:
     ALLEGRO_SAMPLE_INSTANCE *clearSound = NULL;
     ALLEGRO_SAMPLE_INSTANCE *failSound = NULL;
     ALLEGRO_SAMPLE_INSTANCE *backgroundSound = NULL;
+    ALLEGRO_SAMPLE *menu_sound = NULL;
+    ALLEGRO_SAMPLE_INSTANCE *menuSound;
     ALLEGRO_TIMER *timer = NULL;
     ALLEGRO_TIMER *monster_pro = NULL;
-
-
-    int Monster_Pro_Count = 0;
-    int Coin_Inc_Count = 0;
-    int selectedTower = -1, lastClicked = -1;
-
+    int emerald_killed = 0;
+    int xuejila_killed = 0;
+    int ribbonpig_killed = 0;
+    int boss_killed = 0;
+    int monster_killed = 0;
+    int boss_defeated = 0;
+    int monster_spawn = 0;
+    int heal = 0;
+    int invincible = 0;
+    int revive = 0;
     bool redraw = false;
     bool mute = false;
 };
