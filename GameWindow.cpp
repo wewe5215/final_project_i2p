@@ -663,11 +663,27 @@ GameWindow::game_destroy()
 
     al_destroy_bitmap(icon);
     al_destroy_bitmap(background);
-
+    al_destroy_bitmap(menu_pic);
+    al_destroy_bitmap(settings_pic);
+    al_destroy_bitmap(role1);
+    al_destroy_bitmap(role2);
+    al_destroy_bitmap(role3);
+    al_destroy_bitmap(role4);
+    al_destroy_bitmap(role1_tool);
+    al_destroy_bitmap(role2_tool);
+    al_destroy_bitmap(role3_tool);
+    al_destroy_bitmap(role4_tool);
+    al_destroy_bitmap(home_pic);
+    al_destroy_bitmap(enemy1_pic);
+    al_destroy_bitmap(enemy2_pic);
+    al_destroy_bitmap(enemy3_pic);
+    al_destroy_bitmap(boss_pic);
+    al_destroy_bitmap(intro_pic);
     al_destroy_sample(sample);
+    al_destroy_sample(menu_sound);
     al_destroy_sample_instance(startSound);
     al_destroy_sample_instance(backgroundSound);
-
+    al_destroy_sample_instance(menuSound);
     //delete level;
     //delete menu;
 }
