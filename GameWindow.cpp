@@ -407,15 +407,17 @@ void GameWindow::game_update(void) {
             }
         }
         else if(active_scene == SCENE_BOSS){
-             if(boss_killed == 2){
+             if(monster_killed == 10 && boss_killed == 1){
                 for(int i = 0; i < MAX_ENEMY1; i++){
-                    enemy1[i].hidden =  true;
+                    enemy3[i].hidden =  true;
                 }
                 for(int i = 0; i < MAX_BULLET; i++){
                      player_attack[i].hidden =  true;
                 }
+                boss.hidden = true;
             }
             else{
+
                 if(boss.hidden){
                     boss.hidden = false;
                 }
@@ -449,7 +451,65 @@ void GameWindow::game_update(void) {
                         player_attack[i].hidden=true;
                     }
                 }
-            }
+                for(int i = 0; i < MAX_ENEMY3; i++){
+                    if(enemy3[i].hidden){
+                        monster_spawn = (monster_spawn + 1) % 200;
+                        if(monster_spawn == 0){
+                            enemy3[i].hidden = false;
+                            enemy3[i].x = (i % 2) ? window_width - enemy3[i].w : enemy3[i].w;
+                        }
+                    }
+                    else{
+                        enemy3[i].x += enemy3[i].vx * ( i % 2 ? 1 : -1);
+                        if(enemy3[i].x < 0 || enemy3[i].x > window_width)
+                            enemy3[i].vx *= -1;
+                    }
+                }
+                for(int i = 0; i < MAX_BULLET; i++)
+                {
+                    for(int j = 0; j < MAX_ENEMY3; j++)
+                    {
+                        if(player_attack[i].hidden || enemy3[j].hidden) continue;
+                        if((player_attack[i].x <= enemy3[j].x + enemy3[j].w / 2 && player_attack[i].x >= enemy3[j].x - enemy3[j].w / 2))
+                        {
+                            enemy3[j].hp-=player_attack[i].attack;
+                            score+=player_attack[i].attack;
+                            if(enemy3[j].hp<=0)
+                            {
+                                enemy3[j].hidden=true;
+                                xuejila_killed++;
+                                    plus_hp = rand();
+                                    plus_mp = rand();
+                                    if(plus_hp % 3 == 0){
+                                        if(player.hp + 5 > player.full_hp)
+                                            player.hp = player.full_hp;
+                                        else
+                                            player.hp += 5;
+                                    }
+                                    if(plus_mp % 3 == 0)
+                                        if(player.mp + 5 > player.full_mp)
+                                            player.mp = player.full_mp;
+                                        else
+                                            player.mp += 5;
+                            }
+                            player_attack[i].hidden=true;
+                        }
+                    
+                    }
+                }
+                for(i = 0; i < MAX_ENEMY3; i++){
+                    if(enemy3[i].hidden)
+                        continue;
+                    if( enemy3[i].x - enemy3[i].w / 2 <= player.x + player.w / 2 && enemy3[i].x + enemy3[i].w/3 >= player.x - player.w / 2){
+                        enemy3[i].hidden = true;
+                        player.hp -= enemy3[i].attack;
+                        if(player.hp <= 0){
+                            player.hp = player.full_hp;
+                            game_change_scene(SCENE_HOME);
+                        }
+                    }
+                }
+            }       
         }
     }
     else if(active_scene == SCENE_HOME){
@@ -539,6 +599,9 @@ void GameWindow::game_draw(void) {
             }
             if(boss_defeated == 1){
                 al_draw_textf(Large_font, al_map_rgb(0, 0, 0), window_width / 2, window_height / 2, ALLEGRO_ALIGN_CENTER , "Press UP to back to menu.");
+            }
+            for(int i = 0; i < MAX_ENEMY3; i++){
+                draw_movable_object(enemy3[i]);
             }
         }
         al_draw_textf(Medium_font, al_map_rgb(0, 0, 0), 0, 0, ALLEGRO_ALIGN_LEFT , "hp : %d", player.hp);
@@ -767,28 +830,8 @@ void GameWindow::game_change_scene(int next_scene) {
                 boss.hp = 1000;
                 boss.attack = 1000;
                 boss.hidden=true;
-                for(int i = 0; i < MAX_ENEMY1; i++){
-                enemy1[i].img = enemy1_pic;
-                enemy1[i].x = window_width - enemy1[i].w/2;
-                enemy1[i].y = 600;
-                enemy1[i].vx = 2;
-                enemy1[i].w = al_get_bitmap_width(enemy1[i].img);
-                enemy1[i].h = al_get_bitmap_height(enemy1[i].img);
-                enemy1[i].hp = 50;
-                enemy1[i].attack = 20;
-                enemy1[i].hidden = true;
-            }
-            for(int i = 0; i < MAX_ENEMY2; i++){
-                enemy2[i].img = enemy2_pic;
-                enemy2[i].x = window_width - enemy2[i].w/2;
-                enemy2[i].y = 600;
-                enemy2[i].vx = 3;
-                enemy2[i].w = al_get_bitmap_width(enemy2[i].img);
-                enemy2[i].h = al_get_bitmap_height(enemy2[i].img);
-                enemy2[i].hp = 100;
-                enemy2[i].attack = 30;
-                enemy2[i].hidden=true;
-            }
+                
+            
             for(int i = 0; i < MAX_ENEMY3; i++){
                 enemy3[i].img = enemy3_pic;
                 enemy3[i].x = window_width - enemy3[i].w/2;
